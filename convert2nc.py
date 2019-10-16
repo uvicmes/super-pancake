@@ -19,7 +19,7 @@ def realorarchive(date_created, date_processed):
     difference = date_processed - date_created
     difference = difference.days
     print(difference)
-    if difference > 7:
+    if difference > 1:
         return "archive"
 
     else:
@@ -250,7 +250,7 @@ def convert2nc(srcpath, outpath):
         dataset.citation = "The Department of Marine & Environmental Studies of UVI should be cited as the source of " \
                            "the data provided."
         dataset.acknowledgement = "Dr. Paul Jobsis, Dr. Sennai Habtes, Dr. Jorge Capella"
-        dataset.processing_mode = realorarchive(date_fmt, rightnow_date_fmt)
+        dataset.processing_mode = "24 hour intervals"#realorarchive(date_fmt, rightnow_date_fmt)
         dataset.processing_level = "0"
         #dataset.geospatial_bounds =
         dataset.geospatial_lat_min = latitude
