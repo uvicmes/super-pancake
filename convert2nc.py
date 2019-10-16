@@ -1,11 +1,15 @@
 #alphabuild
-import os, csv, json, glob, datetime
-import pandas as pd
+import csv
+import datetime
+import glob
+import json
+import os
+
 import numpy as np
-from netCDF4 import Dataset, date2num
+import pandas as pd
 from dateutil import parser
 from jdcal import gcal2jd
-import datetime
+from netCDF4 import Dataset, date2num
 
 
 def realorarchive(date_created, date_processed):
