@@ -96,6 +96,7 @@ def convert2nc(srcpath, outpath):
         evb13, evb14, evb15 = [], [], []
         evb16, evb17, evb18 = [], [], []
         evb19, evb20 = [], []
+        totalevb = []
 
         nvb1, nvb2, nvb3 = [], [], []
         nvb4, nvb5, nvb6 = [], [], []
@@ -104,6 +105,7 @@ def convert2nc(srcpath, outpath):
         nvb13, nvb14, nvb15 = [], [], []
         nvb16, nvb17, nvb18 = [], [], []
         nvb19, nvb20 = [], []
+        totalnvb = []
 
         mcspd, mcdir = [], []
 
@@ -168,6 +170,16 @@ def convert2nc(srcpath, outpath):
             instdepth.append((csvdf[14][index])), insthead.append((csvdf[15][index])), instpitch.append((csvdf[16][index]))
             instroll.append((csvdf[17][index])), instpres.append((csvdf[18][index]))
 
+            i = 19
+            k = 20
+            for m in range(20):
+                totalevb.append(csvdf[i][index])
+                totalnvb.append(csvdf[k][index])
+                i += 2
+                k += 2
+
+            print(totalnvb)
+            
             evb1.append((csvdf[19][index]))
             nvb1.append((csvdf[20][index])), evb2.append((csvdf[21][index])), nvb2.append((csvdf[22][index]))
             evb3.append((csvdf[23][index])), nvb3.append((csvdf[24][index])), evb4.append((csvdf[25][index]))
@@ -301,7 +313,7 @@ def convert2nc(srcpath, outpath):
         lon.stardard_name = "longitude"
         lon.short_name = "lon"
         lon.units = "degrees_west"
-        lon.valid_range = -180 - 180
+        lon.valid_range = -180., 180.
         lon.comment = "Coordinate variable"
         lon[:] = longitude
         
@@ -310,7 +322,7 @@ def convert2nc(srcpath, outpath):
         lat.standard_name = "latitude"
         lat.short_name = "lat"
         lat.units = "degrees_north"
-        lat.valid_range = -90 - 90
+        lat.valid_range = -90., 90.
         lat.comment = "Coordinate variable"
         lat[:] = latitude
 
@@ -436,60 +448,60 @@ def convert2nc(srcpath, outpath):
         battery_voltage.is_dead = 0
         battery_voltage[:] = battv
 
-        instrument_heading = dataset.createVariable("INST-HEADING", "f8", ("time", "lon", "lat",))
-        instrument_heading.long_name = "Instrument Heading"
-        instrument_heading.standard_name = "instrument_heading"
-        instrument_heading.short_name = "INST-HEADING"
-        instrument_heading.units = "degrees_magnetic"
+        instrument_heading = dataset.createVariable("platform_heading", "f8", ("time", "lon", "lat",))
+        instrument_heading.long_name = "Platform Heading"
+        instrument_heading.standard_name = "platform_heading"
+        instrument_heading.short_name = "HEADING"
+        instrument_heading.units = "degrees" #magnetic
         instrument_heading.measurement_type = "measured"
         instrument_heading.is_dead = "N/A"
         instrument_heading[:] = insthead
 
-        instrument_pitch = dataset.createVariable("INST-PITCH", "f8", ("time", "lon", "lat",))
-        instrument_pitch.long_name = "Instrument Pitch"
-        instrument_pitch.standard_name = "instrument_pitch"
-        instrument_pitch.short_name = "INST-PITCH"
+        instrument_pitch = dataset.createVariable("platform_pitch", "f8", ("time", "lon", "lat",))
+        instrument_pitch.long_name = "Platform Pitch"
+        instrument_pitch.standard_name = "platform_pitch"
+        instrument_pitch.short_name = "PITCH"
         instrument_pitch.units = "degrees"
         instrument_pitch.measurement_type = "measured"
         instrument_pitch.is_dead = "N/A"
         instrument_pitch[:] = instpitch
 
-        instrument_roll = dataset.createVariable("INST-ROLL", "f8", ("time", "lon", "lat",))
-        instrument_roll.long_name = "Instrument Roll"
-        instrument_roll.standard_name = "instrument_roll"
-        instrument_roll.short_name = "INST-ROLL"
+        instrument_roll = dataset.createVariable("platform_roll", "f8", ("time", "lon", "lat",))
+        instrument_roll.long_name = "Platform Roll"
+        instrument_roll.standard_name = "platform_roll"
+        instrument_roll.short_name = "ROLL"
         instrument_roll.units = "degrees"
         instrument_roll.measurement_type = "measured"
         instrument_roll.is_dead = "N/A"
         instrument_roll[:] = instroll
 
-        instrument_pressure = dataset.createVariable("INST-PRES", "f8", ("time", "lon", "lat",))
-        instrument_pressure.long_name = "Instrument Pressure"
-        instrument_pressure.standard_name = "instrument_pressure"
-        instrument_pressure.short_name = "INST-PRES"
+        instrument_pressure = dataset.createVariable("platform_pres", "f8", ("time", "lon", "lat",))
+        instrument_pressure.long_name = "Platform Pressure"
+        instrument_pressure.standard_name = "platform_pres"
+        instrument_pressure.short_name = "platform_pres"
         instrument_pressure.units = "kPa"
         instrument_pressure.measurement_type = "measured"
         instrument_pressure.is_dead = "N/A"
         instrument_pressure[:] = instpres
 
-        east_velocity1 = dataset.createVariable("EVB01", "f8", ("time", "lon", "lat",))
-        east_velocity1.long_name = "East Velocity Bin 01"
-        east_velocity1.standard_name = "east_velocity_bin_01"
-        east_velocity1.short_name = "EVB01"
-        east_velocity1.units = "01mm/s"
+        east_velocity1 = dataset.createVariable("u", "f8", ("time", "lon", "lat",))
+        east_velocity1.long_name = "Eastward Sea Water Velocity"
+        east_velocity1.standard_name = "eastward_sea_water_velocity"
+        east_velocity1.short_name = "u"
+        east_velocity1.units = "01 mm s-1"
         east_velocity1.measurement_type = "measured"
         east_velocity1.is_dead = "N/A"
         east_velocity1[:] = evb1
 
-        north_velocity1 = dataset.createVariable("NVB01", "f8", ("time", "lon", "lat",))
-        north_velocity1.long_name = "North Velocity Bin 01"
-        north_velocity1.standard_name = "north_velocity_bin_01"
-        north_velocity1.short_name = "NVB01"
-        north_velocity1.units = "01mm/s"
+        north_velocity1 = dataset.createVariable("v", "f8", ("time", "lon", "lat",))
+        north_velocity1.long_name = "Northward Sea Water Velocity"
+        north_velocity1.standard_name = "northward_sea_water_velocity"
+        north_velocity1.short_name = "v"
+        north_velocity1.units = "01 mm s-1"
         north_velocity1.measurement_type = "measured"
         north_velocity1.is_dead = "N/A"
         north_velocity1[:] = nvb1
-
+        '''
         east_velocity2 = dataset.createVariable("EVB02", "f8", ("time", "lon", "lat",))
         east_velocity2.long_name = "East Velocity Bin 02"
         east_velocity2.standard_name = "east_velocity_bin_02"
@@ -831,6 +843,7 @@ def convert2nc(srcpath, outpath):
         north_velocity20.measurement_type = "measured"
         north_velocity20.is_dead = "N/A"
         north_velocity20[:] = nvb20
+        '''
 
         mean_current_velocity_magnitude = dataset.createVariable("MCSPD", "f8", ("time", "lon", "lat",))
         mean_current_velocity_magnitude.long_name = "Mean Current Speed"
@@ -871,6 +884,7 @@ def convert2nc(srcpath, outpath):
         percent_good_bin_01.is_dead = "N/A"
         percent_good_bin_01[:] = pgb1
 
+        '''
         percent_good_bin_02 = dataset.createVariable("PGB02", "f8", ("time", "lon", "lat",))
         percent_good_bin_02.long_name = "Percent Good Bin 02"
         percent_good_bin_02.standard_name = "percent_good_bin_02"
@@ -1041,7 +1055,7 @@ def convert2nc(srcpath, outpath):
         percent_good_bin_20.measurement_type = "measured"
         percent_good_bin_20.is_dead = "N/A"
         percent_good_bin_20[:] = pgb20
-
+        '''
         echo_amp_1_bin_1 = dataset.createVariable("EA01B01", "f8", ("time", "lon", "lat",))
         echo_amp_1_bin_1.long_name = "Echo Amplitude 01 Bin 01"
         echo_amp_1_bin_1.standard_name = "echo_amplitude_01_bin_01"
@@ -1050,7 +1064,7 @@ def convert2nc(srcpath, outpath):
         echo_amp_1_bin_1.measurement_type = "measured"
         echo_amp_1_bin_1.is_dead = "N/A"
         echo_amp_1_bin_1[:] = EA01B01
-
+        '''
         echo_amp_2_bin_1 = dataset.createVariable("EA02B01", "f8", ("time", "lon", "lat",))
         echo_amp_2_bin_1.long_name = "Echo Amplitude 02 Bin 01"
         echo_amp_2_bin_1.standard_name = "echo_amplitude_02_bin_01"
@@ -1581,7 +1595,7 @@ def convert2nc(srcpath, outpath):
         echo_amp_3_bin_20.measurement_type = "measured"
         echo_amp_3_bin_20.is_dead = "N/A"
         echo_amp_3_bin_20[:] = EA03B20
-    
+        '''
         # print(dataset.variables)
         dataset.close()
         print(dataset.file_format)
