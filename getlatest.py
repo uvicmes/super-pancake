@@ -13,42 +13,27 @@ def latestFileinDirectory(srcpath):
     # print(latest_file)
     return latest_file
 
-def csv2json(srcpath, outpath):
-    url = "http://ocovipreview.azurewebsites.net/station/"
-    headers = {"Content-type": "application/json"}
-    myjson = [{
+def csv2json(srcpath):
+    url = "http://ocovipreview.azurewebsites.net/station/data"
+    header = {"Content-type": "application/json"}
+    jsonskeleton = [{
     "stationId": "e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b",
-    "date": "2019-10-17 20:48:00",
+    "date": "2019-10-17 22:49:00",
     "temperature": 29.2,
-    "windspeed": 11.5,
+    "windspeed": 11.0,
     "windDirection": 95.0,
     "currentSpeed": 0.02,
     "currentDirection": 191.0
     }]
-    myjson2 = {'stationid':'e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b', 'date':'2019-10-16 20:28:00', 'temperature':29.2, 'windSpeed':11.5, 'windDirection':95.0, 'currentSpeed':0.02, 'currentDirection':191.0}
     csvsource = latestFileinDirectory(srcpath)
-    '''data = []
+    payload = []
     with open(csvsource) as f:
         for row in csv.DictReader(f):
-            print(row)
-            data.append(row)
+            payload.append(row)
         f.close()
-
-    with open(outpath + "latestcrownbaydata.json", 'w') as f:
-        json.dump(myjson, f, indent=4)
-
-        f.close()
-
-    with open(outpath + "latestcrownbaydata.json") as json_file:
-        jsondata = json.load(json_file)
-        print(jsondata)
-        
-        r = requests.post("http://ocovipreview.azurewebsites.net/station/data", headers=headers, data=jsondata)
-        print(r.status_code, r.reason)
-        json_file.close()'''
-    jsondata = json.dumps(myjson, separators=(',', ':'))
-    #print(jsondata)
-    r = requests.post("http://ocovipreview.azurewebsites.net/station/data", data=jsondata, headers=headers)
+    jsonpayload = json.dumps(payload, separators=(',', ':'))
+    print(jsonpayload)
+    r = requests.post(url, data=jsonpayload, headers=header)
     print(r.status_code, r.reason)
 
 
@@ -198,8 +183,6 @@ def process_csv(src, out):
 
     for file in csv_directory:
 
-
-
         csvname = file[-31:]
         csvsize = os.stat(file).st_size
         year = file[-16:-14]
@@ -274,9 +257,6 @@ if __name__ == '__main__':
     todayprocessedDir = "/home/caricoos/tmp/sutron-crownbay_dir/processedcsv/"
     jsonDir = "/home/caricoos/tmp/sutron-crownbay_dir/latest_jsonfile/"
 
-
-
-    #current_date = datetime.date.today()
     pastdays = 0
 
     current_date = datetime.datetime.utcnow()
@@ -285,7 +265,6 @@ if __name__ == '__main__':
     pastdays_date = current_date - timedelta(days=pastdays)
     pastdays_julianyear = pastdays_date.timetuple().tm_year
     pastdays_julianday = pastdays_date.timetuple().tm_yday
-
 
     print(current_date)
     print(current_julianyear)
@@ -298,9 +277,6 @@ if __name__ == '__main__':
         os.makedirs(jsonDir)
         os.makedirs(todayprocessedDir)
 
-
     fetchcurrentFiles(todayogDir)
     process_csv(todayogDir, todayprocessedDir)
-    csv2json(todayprocessedDir, jsonDir)
-
-
+    csv2json(todayprocessedDir)
