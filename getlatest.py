@@ -15,10 +15,19 @@ def latestFileinDirectory(srcpath):
 
 def csv2json(srcpath, outpath):
     url = "http://ocovipreview.azurewebsites.net/station/"
-    headers = {'Content-type': 'application/json; charset=utf-8', 'Accept': '*/*'}
-    myjson = {"stationid":"e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b","date":"2019-10-14 14:48:00", "temperature":29.2, "windSpeed": 11.5, "windDirection": 95.0, "currentSpeed": 0.02, "currentDirection": 191.0}
+    headers = {"Content-type": "application/json"}
+    myjson = [{
+    "stationId": "e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b",
+    "date": "2019-10-17 20:48:00",
+    "temperature": 29.2,
+    "windspeed": 11.5,
+    "windDirection": 95.0,
+    "currentSpeed": 0.02,
+    "currentDirection": 191.0
+    }]
+    myjson2 = {'stationid':'e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b', 'date':'2019-10-16 20:28:00', 'temperature':29.2, 'windSpeed':11.5, 'windDirection':95.0, 'currentSpeed':0.02, 'currentDirection':191.0}
     csvsource = latestFileinDirectory(srcpath)
-    data = []
+    '''data = []
     with open(csvsource) as f:
         for row in csv.DictReader(f):
             print(row)
@@ -34,10 +43,12 @@ def csv2json(srcpath, outpath):
         jsondata = json.load(json_file)
         print(jsondata)
         
-        r = requests.post("http://ocovipreview.azurewebsites.net/station/", headers=headers, data=jsondata)
+        r = requests.post("http://ocovipreview.azurewebsites.net/station/data", headers=headers, data=jsondata)
         print(r.status_code, r.reason)
-        json_file.close()
-    r = requests.post("http://ocovipreview.azurewebsites.net/station/", headers=headers, data=jsondata)
+        json_file.close()'''
+    jsondata = json.dumps(myjson, separators=(',', ':'))
+    #print(jsondata)
+    r = requests.post("http://ocovipreview.azurewebsites.net/station/data", data=jsondata, headers=headers)
     print(r.status_code, r.reason)
 
 
