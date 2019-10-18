@@ -1279,5 +1279,3 @@ if __name__ == "__main__":
     concatcsvDir = "/home/caricoos/ftp/concatcsvfolder/"
 
     convert2nc(concatcsvDir, ncDir)
-
-    # csv2json(csvDir, jsonDir)
