@@ -136,8 +136,8 @@ def fetchcurrentFiles(path):
     latest_data = latest_data.replace("\n", "")
     latest_data = latest_data.split(',')
     
-    print(latest_data)
     print(type(latest_data))
+    print(latest_data)
     
     columns = ["Station", "Date(GMT)", "Time(GMT)", "WSPD(kts)",
                "WDIR(degM)", "GST(kts)", "PRES(mm)", "ATMP(degC)", "RH(percent)", "RAIN(inches/hour)",
@@ -195,8 +195,6 @@ def fetchcurrentFiles(path):
     else:
         currentspeed = float("{0:.2f}".format(float(df["MCSPD(kts)"][0])))
         currentdir = int((df["MCDIR(degM)"][0]).replace(".000", ""))
-
-    print(time, windspeed, winddir, temperature, currentspeed, currentdir)
 
     jsonskeleton = {
         "stationId": "e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b",

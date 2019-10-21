@@ -7,6 +7,7 @@ import glob
 from jdcal import gcal2jd
 from dateutil import parser
 import pandas as pd
+from base64 import encodebytes
 
 def sendemail(sender_address, sender_pass, attach_file_name, receiver_address):
     import smtplib
@@ -14,6 +15,7 @@ def sendemail(sender_address, sender_pass, attach_file_name, receiver_address):
     from email.mime.text import MIMEText
     from email.mime.base import MIMEBase
     from email import encoders
+    from email.mime.application import MIMEApplication
     mail_content = '''Hello,
 
     This is the Crown Bay weather station alert bot.
@@ -21,11 +23,6 @@ def sendemail(sender_address, sender_pass, attach_file_name, receiver_address):
 
     If you have any question, please contact the data manager @ CMES.
     '''
-    # The mail addresses and password
-    #sender_address = 'sender123@gmail.com'
-    #sender_pass = 'xxxxxxxx'
-    #receiver_address = 'receiver567@gmail.com'
-    # Setup the MIME
     message = MIMEMultipart()
     message['From'] = sender_address
     message['To'] = receiver_address
@@ -34,14 +31,15 @@ def sendemail(sender_address, sender_pass, attach_file_name, receiver_address):
     # The body and the attachments for the mail
     message.attach(MIMEText(mail_content, 'plain'))
     #attach_file_name = 'TP_python_prev.pdf'
-    attach_file = open(attach_file_name, 'rb')  # Open the file as binary mode
-    #text = MIMEText(attach_file.read(), "txt")
-    payload = MIMEBase('application', 'octate-stream')
-    payload.set_payload((attach_file).read(), "txt")
-    encoders.encode_base64(payload)  # encode the attachment
-    # add payload header with filename
-    payload.add_header('Content-Decomposition', 'attachment', filename=attach_file_name)
-    message.attach(payload)
+    attachment = os.path.basename(attach_file_name)
+    
+    fp = open(attach_file_name, 'rb')
+    part = MIMEBase('application', "octet-stream")
+    part.set_payload(encodebytes(fp.read()).decode())
+    fp.close()
+    part.add_header('Content-Transfer-Encoding', 'base64')
+    part.add_header('Content-Disposition', 'attachment; filename="%s"' % attachment)
+    message.attach(part)   # msg is an instance of MIMEMultipart()
     # Create SMTP session for sending the mail
     session = smtplib.SMTP('smtp.gmail.com', 587)  # use gmail with port
     session.starttls()  # enable security
@@ -63,48 +61,31 @@ def fetchcurrentFiles(src):
     if not os.path.exists(src):
         os.makedirs(src)
 
-    timedelta = ['000650', '001250', '001850', '002450', '003050', '003650', '004250', '004850', '005450', '010050',
-                 '010650', '011250', '011850', '012450', '013050', '013650', '014250', '014850', '015450', '020050',
-                 '020650',
-                 '021250', '021850', '022450', '023050', '023650', '024250', '024850', '025450', '030050', '030650',
-                 '031250',
-                 '031850', '032450', '033050', '033650', '034250', '034850', '035450', '040050', '040650', '041250',
-                 '041850',
-                 '042450', '043050', '043650', '044250', '044850', '045450', '050050', '050650', '051250', '051850',
-                 '052450',
-                 '053050', '053650', '054250', '054850', '055450', '060050', '060650', '061250', '061850', '062450',
-                 '063050',
-                 '063650', '064250', '064850', '065450', '070050', '070650', '071250', '071850', '072450', '073050',
-                 '073650',
-                 '074250', '074850', '075450', '080050', '080650', '081250', '081850', '082450', '083050', '083650',
-                 '084250',
-                 '084850', '085450', '090050', '090650', '091250', '091850', '092450', '093050', '093650', '094250',
-                 '094850',
-                 '095450', '100050', '100650', '101250', '101850', '102450', '103050', '103650', '104250', '104850',
-                 '105450',
-                 '110050', '110650', '111250', '111850', '112450', '113050', '113650', '114250', '114850', '115450',
-                 '120050',
-                 '120650', '121250', '121850', '122450', '123050', '123650', '124250', '124850', '125450', '130050',
-                 '130650',
-                 '131250', '131850', '132450', '133050', '133650', '134250', '134850', '135450', '140050', '140650',
-                 '141250',
-                 '141850', '142450', '143050', '143650', '144250', '144850', '145450', '150050', '150650', '151250',
-                 '151850',
-                 '152450', '153050', '153650', '154250', '154850', '155450', '160050', '160650', '161250', '161850',
-                 '162450',
-                 '163050', '163650', '164250', '164850', '165450', '170050', '170650', '171250', '171850', '172450',
-                 '173050',
-                 '173650', '174250', '174850', '175450', '180050', '180650', '181250', '181850', '182450', '183050',
-                 '183650',
-                 '184250', '184850', '185450', '190050', '190650', '191250', '191850', '192450', '193050', '193650',
-                 '194250',
-                 '194850', '195450', '200050', '200650', '201250', '201850', '202450', '203050', '203650', '204250',
-                 '204850',
-                 '205450', '210050', '210650', '211250', '211850', '212450', '213050', '213650', '214250', '214850',
-                 '215450',
-                 '220050', '220650', '221250', '221850', '222450', '223050', '223650', '224250', '224850', '225450',
-                 '230050',
-                 '230650', '231250', '231850', '232450', '233050', '233650', '234250', '234850', '235450']
+    timedelta = ["000050", "000650", "001250", "001850", "002450", "003050", "003650", "004250", "004850", "005450",
+                 "010050", "010650", "011250", "011850", "012450", "013050", "013650", "014250", "014850", "015450",
+                 "020050", "020650", "021250", "021850", "022450", "023050", "023650", "024250", "024850", "025450",
+                 "030050", "030650", "031250", "031850", "032450", "033050", "033650", "034250", "034850", "035450",
+                 "040050", "040650", "041250", "041850", "042450", "043050", "043650", "044250", "044850", "045450",
+                 "050050", "050650", "051250", "051850", "052450", "053050", "053650", "054250", "054850", "055450",
+                 "060050", "060650", "061250", "061850", "062450", "063050", "063650", "064250", "064850", "065450",
+                 "070050", "070650", "071250", "071850", "072450", "073050", "073650", "074250", "074850", "075450",
+                 "080050", "080650", "081250", "081850", "082450", "083050", "083650", "084250", "084850", "085450",
+                 "090050", "090650", "091250", "091850", "092450", "093050", "093650", "094250", "094850", "095450",
+                 "100050", "100650", "101250", "101850", "102450", "103050", "103650", "104250", "104850", "105450",
+                 "110050", "110650", "111250", "111850", "112450", "113050", "113650", "114250", "114850", "115450",
+                 "120050", "120650", "121250", "121850", "122450", "123050", "123650", "124250", "124850", "125450",
+                 "130050", "130650", "131250", "131850", "132450", "133050", "133650", "134250", "134850", "135450",
+                 "140050", "140650", "141250", "141850", "142450", "143050", "143650", "144250", "144850", "145450",
+                 "150050", "150650", "151250", "151850", "152450", "153050", "153650", "154250", "154850", "155450",
+                 "160050", "160650", "161250", "161850", "162450", "163050", "163650", "164250", "164850", "165450",
+                 "170050", "170650", "171250", "171850", "172450", "173050", "173650", "174250", "174850", "175450",
+                 "180050", "180650", "181250", "181850", "182450", "183050", "183650", "184250", "184850", "185450",
+                 "190050", "190650", "191250", "191850", "192450", "193050", "193650", "194250", "194850", "195450",
+                 "200050", "200650", "201250", "201850", "202450", "203050", "203650", "204250", "204850", "205450",
+                 "210050", "210650", "211250", "211850", "212450", "213050", "213650", "214250", "214850", "215450",
+                 "220050", "220650", "221250", "221850", "222450", "223050", "223650", "224250", "224850", "225450",
+                 "230050", "230650", "231250", "231850", "232450", "233050", "233650", "234250", "234850", "235450"]
+    
     timedelta2 = '000050'
 
     for i in timedelta:
@@ -211,7 +192,6 @@ def process_csv(src, out, log):
     log_file_path = log + "vi_stt_crownbay_" + str(pastdays_julianyear).zfill(2) + str(pastdays_julianday).zfill(3) + "_log.txt"
     f = open(log_file_path, 'w+')
     f.write("URL = http://sutronwin.com/goesweb/uvidock/?C=N;O=D\n")
-
     csv_directory = sorted(glob.glob(src + "*.csv"))
 
     columns = ["Station", "Date(GMT)", "Time(GMT)", "WSPD(kts)",
@@ -362,9 +342,10 @@ def process_csv(src, out, log):
     f.close()
 
     #send email if the number of missing data is greater than the # assigned.
-    if(total_bad > 24):
+    if(total_bad > 30):
         print(log_file_path)
-        sendemail("ocoviteam@gmail.com","76!_cz7Ra6p_PBY!", log_file_path, "andyvp@live.com")
+        sendemail("cmesuvistt@gmail.com", "cmesuniversity123",
+                  log_file_path, "andyvp@live.com")
 
 def concat_csv(src, out):
 
