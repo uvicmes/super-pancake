@@ -15,17 +15,46 @@ def latestFileinDirectory(srcpath):
 def csv2json2send(payload):
     url = "http://ocovipreview.azurewebsites.net/station/data"
     header = {"Content-type": "application/json"}
-    
     payload = [payload]
     jsonpayload = json.dumps(payload, separators=(',', ':'))
-    print(jsonpayload)
+    print("json serialized", jsonpayload)
     r = requests.post(url, data=jsonpayload, headers=header)
     print(r.status_code, r.reason)
 
-def fetchcurrentFiles():
+def doublechecker(src, currentdate):
+    
+    srcdate = src+"latestjsonfile.txt"
+    contents = ""
+    if os.path.isfile(srcdate):
+        with open(srcdate, 'r') as f:
+            contents = f.read()
+            print(type(contents), type(currentdate))
+            print(contents, currentdate)
+            
+            if (contents == currentdate):
+                print("the latest date is already posted.")
+                f.close()
+                return True
+
+            else:
+                print("file exist, but the dates are different, posting the newest date.")
+                with open(srcdate, 'w') as f:
+                    f.write(currentdate)
+                    f.close()
+                return False
+    
+    else:
+        print("file doesn't exist, creating and posting the new file")
+        with open(srcdate, 'w') as f:
+            f.write(currentdate)
+            f.close()
+        return False
+
+def fetchcurrentFiles(path):
 
     sutronurl = "http://sutronwin.com/goesweb/uvidock/"
     sutronurl2 = "http://sutronwin.com/goesweb/uvidock/?C=N;O=D"
+    
     latest_data = ""
 
     timedelta = ["000050", "000650", "001250", "001850", "002450", "003050", "003650", "004250", "004850", "005450",
@@ -74,14 +103,13 @@ def fetchcurrentFiles():
         fullURL2 = fullURL[:-1] + '1'
         filename = prefilename + i
 
-        if "skfjsdlf" == "dfsdsd":
-            print("this")
-
         if(str_past_time < i):
             
             if(str_current_time > i):
-                print(i)        
+                print(i)
+                #fullURL = "http://sutronwin.com/goesweb/uvidock/virgin_islands-19294-135450" #TEST file
                 request = requests.get(fullURL)
+
                 if request.status_code == 200:
                     print(200, fullURL)
                     latest_data = request.content.decode("utf-8")
@@ -157,12 +185,16 @@ def fetchcurrentFiles():
     windspeed = float("{0:.2f}".format(float(df["WSPD(kts)"][0])))
     winddir = int((df["WDIR(degM)"][0]).replace(".0000", ""))
     temperature = float("{0:.2f}".format(float(df["ATMP(degC)"][0])))
-    currentspeed = float("{0:.2f}".format(float(df["MCSPD(kts)"][0])))
-    currentdir = int((df["MCDIR(degM)"][0]).replace(".000",""))
+    currentspeed = (df["MCSPD(kts)"][0]).replace("'", "")
+    currentdir = (df["MCDIR(degM)"][0]).replace("'","")
         
-    if(currentspeed == "NaN"):
+    if(currentspeed == ""):
         currentspeed = -1
         currentdir = -1
+
+    else:
+        currentspeed = float("{0:.2f}".format(float(df["MCSPD(kts)"][0])))
+        currentdir = int((df["MCDIR(degM)"][0]).replace(".000", ""))
 
     print(time, windspeed, winddir, temperature, currentspeed, currentdir)
 
@@ -176,12 +208,17 @@ def fetchcurrentFiles():
         "currentDirection": currentdir
     }
 
-    print(jsonskeleton)
-    csv2json2send(jsonskeleton)
+    print("raw json", jsonskeleton)
+
+    gatekeeper = doublechecker(srcpath, time)
+    
+    if (gatekeeper == False):
+        csv2json2send(jsonskeleton)
 
 if __name__ == '__main__':
+    srcpath = "/home/caricoos/tmp/jsondata/"
 
-    fetchcurrentFiles()
+    if not os.path.exists(srcpath):
+        os.makedirs(srcpath)
 
-    #process_csv(todayogDir, todayprocessedDir)
-    #csv2json(todayprocessedDir)
+    fetchcurrentFiles(srcpath)
