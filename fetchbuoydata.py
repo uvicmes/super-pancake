@@ -338,7 +338,7 @@ def process_csv(src, out, log):
             str(partial_count) + "/" + str(total_cnt) + " files with partial data.\n" +
             str(none_count) + "/" + str(total_cnt) + " with no data.\n")
     f.write("Date of log files: "+ str(fmt_date)+"Z\n")
-    f.write("Log generated on: "+ str(datetime.datetime.utcnow().strftime("'%m/%d/%Y %H:%m"))+"Z\n")
+    f.write("Log generated on: "+ str(datetime.datetime.utcnow().strftime("%m/%d/%Y %H:%m"))+"Z\n")
     f.close()
 
     #send email if the number of missing data is greater than the # assigned.

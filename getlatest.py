@@ -183,7 +183,7 @@ def fetchcurrentFiles(path):
     time = df["Date(GMT)"][0]+" "+df['Time(GMT)'][0]
     time = parser.parse(time).strftime("%Y-%m-%d %H:%M:%S")
     windspeed = float("{0:.2f}".format(float(df["WSPD(kts)"][0])))
-    winddir = int((df["WDIR(degM)"][0]).replace(".0000", ""))
+    winddir = float((df["WDIR(degM)"][0]).replace(".0000", ""))
     temperature = float("{0:.2f}".format(float(df["ATMP(degC)"][0])))
     currentspeed = (df["MCSPD(kts)"][0]).replace("'", "")
     currentdir = (df["MCDIR(degM)"][0]).replace("'","")
@@ -194,7 +194,7 @@ def fetchcurrentFiles(path):
 
     else:
         currentspeed = float("{0:.2f}".format(float(df["MCSPD(kts)"][0])))
-        currentdir = int((df["MCDIR(degM)"][0]).replace(".000", ""))
+        currentdir = float((df["MCDIR(degM)"][0]).replace(".000", ""))
 
     jsonskeleton = {
         "stationId": "e6a9b7d8-5f68-4afa-a6e2-809b792b9d0b",
