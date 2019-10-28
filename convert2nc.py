@@ -116,6 +116,7 @@ def convert2nc(srcpath, outpath):
         pgb13, pgb14, pgb15 = [], [], []
         pgb16, pgb17, pgb18 = [], [], []
         pgb19, pgb20 = [], []
+        totalpgb = []
 
         EA01B01, EA02B01, EA03B01 = [], [], []
         EA01B02, EA02B02, EA03B02 = [], [], []
@@ -137,6 +138,7 @@ def convert2nc(srcpath, outpath):
         EA01B18, EA02B18, EA03B18 = [], [], []
         EA01B19, EA02B19, EA03B19 = [], [], []
         EA01B20, EA02B20, EA03B20 = [], [], []
+        totalEA01, totalEA02, totalEA03 = [], [], []
 
         for index, row in csvdf.iterrows():
 
@@ -162,6 +164,7 @@ def convert2nc(srcpath, outpath):
             '''
 
             time.append(float(nc_datetime))
+            #time = time.pop(0) #this fix the bug having duplicated times
 
             wspd.append((csvdf[5][index])), wdir.append((csvdf[6][index])), gst.append((csvdf[7][index]))
             pres.append((csvdf[8][index])), atmp.append((csvdf[9][index])), rehu.append((csvdf[10][index]))
@@ -170,25 +173,39 @@ def convert2nc(srcpath, outpath):
             instdepth.append((csvdf[14][index])), insthead.append((csvdf[15][index])), instpitch.append((csvdf[16][index]))
             instroll.append((csvdf[17][index])), instpres.append((csvdf[18][index]))
 
-            i = 19
-            k = 20
+            evb_i = 19
+            nvb_i = 20
+            pgb_i = 61
+            EA01_i = 81
+            EA02_i = 82
+            EA03_i = 83
+
             for m in range(20):
-                totalevb.append(csvdf[i][index])
-                totalnvb.append(csvdf[k][index])
-                i += 2
-                k += 2
+                totalevb.append(csvdf[evb_i][index])
+                totalnvb.append(csvdf[nvb_i][index])
+                totalpgb.append(csvdf[pgb_i][index])
+                totalEA01.append(csvdf[EA01_i][index])
+                totalEA02.append(csvdf[EA02_i][index])
+                totalEA03.append(csvdf[EA03_i][index])
+
+                evb_i += 2
+                nvb_i += 2
+                pgb_i += 1
+                EA01_i += 3
+                EA02_i += 3
+                EA03_i += 3
             
             mcspd.append((csvdf[59][index])), mcdir.append((csvdf[60][index]))
 
-            pgb1.append((csvdf[61][index])), pgb2.append((csvdf[62][index])), pgb3.append((csvdf[63][index]))
+            '''pgb1.append((csvdf[61][index])), pgb2.append((csvdf[62][index])), pgb3.append((csvdf[63][index]))
             pgb4.append((csvdf[64][index])), pgb5.append((csvdf[65][index])), pgb6.append((csvdf[66][index]))
             pgb7.append((csvdf[67][index])), pgb8.append((csvdf[68][index])), pgb9.append((csvdf[69][index]))
             pgb10.append((csvdf[70][index])), pgb11.append((csvdf[71][index])), pgb12.append((csvdf[72][index]))
             pgb13.append((csvdf[73][index])), pgb14.append((csvdf[74][index])), pgb15.append((csvdf[75][index]))
             pgb16.append((csvdf[76][index])), pgb17.append((csvdf[77][index])), pgb18.append((csvdf[78][index]))
-            pgb19.append((csvdf[79][index])), pgb20.append((csvdf[80][index]))
+            pgb19.append((csvdf[79][index])), pgb20.append((csvdf[80][index]))'''
 
-            EA01B01.append((csvdf[81][index])), EA02B01.append((csvdf[82][index])), EA03B01.append((csvdf[83][index]))
+            '''EA01B01.append((csvdf[81][index])), EA02B01.append((csvdf[82][index])), EA03B01.append((csvdf[83][index]))
             EA01B02.append((csvdf[84][index])), EA02B02.append((csvdf[85][index])), EA03B02.append((csvdf[86][index]))
             EA01B03.append((csvdf[87][index])), EA02B03.append((csvdf[88][index])), EA03B03.append((csvdf[89][index]))
             EA01B04.append((csvdf[90][index])), EA02B04.append((csvdf[91][index])), EA03B04.append((csvdf[92][index]))
@@ -207,7 +224,7 @@ def convert2nc(srcpath, outpath):
             EA01B17.append((csvdf[129][index])), EA02B17.append((csvdf[130][index])), EA03B17.append((csvdf[131][index]))
             EA01B18.append((csvdf[132][index])), EA02B18.append((csvdf[133][index])), EA03B18.append((csvdf[134][index]))
             EA01B19.append((csvdf[135][index])), EA02B19.append((csvdf[136][index])), EA03B19.append((csvdf[137][index]))
-            EA01B20.append((csvdf[138][index])), EA02B20.append((csvdf[139][index])), EA03B20.append((csvdf[140][index]))
+            EA01B20.append((csvdf[138][index])), EA02B20.append((csvdf[139][index])), EA03B20.append((csvdf[140][index]))'''
 
         print(file[-34:-4])
         print(len(totalnvb))
@@ -291,6 +308,10 @@ def convert2nc(srcpath, outpath):
         times.comment = "Coordinate variable"
         times.reference = "https://www.programcreek.com/python/example/89490/netCDF4.date2num"
         times.note = ""
+        print(times.shape)
+        time.pop(0)
+        #time = np.array([time])
+        #print(time.shape)
         times[:] = time
 
         lon = dataset.createVariable("lon", 'd', ('lon',))
@@ -320,10 +341,10 @@ def convert2nc(srcpath, outpath):
         depth.comment = "Coordinate variable"
         depth[:] = instdepth
 
-        barometric_pressure = dataset.createVariable("PRES", "f8", ("time", "lon", "lat",))
+        barometric_pressure = dataset.createVariable("bp", "f8", ("time", "lon", "lat",))
         barometric_pressure.long_name = "Barometric Pressure"
         barometric_pressure.standard_name = "barometric_pressure"
-        barometric_pressure.short_name = "PRES"
+        barometric_pressure.short_name = "bp"
         # barometric_pressure.ancillary_variables = "barometric_pressure_qc"
         barometric_pressure.measurement_type = "measured"
         barometric_pressure.units = "hPa"
@@ -355,8 +376,8 @@ def convert2nc(srcpath, outpath):
         wind_direction.short_name = "WDIR"
         wind_direction.dependency = "wind_speed"
         wind_direction.measurement_type = "measured"
-        wind_direction.units = "degrees_magnetic"
-        wind_direction.range = "0 ... 360 degrees"
+        wind_direction.units = "deg"
+        wind_direction.range = "0 - 360"
         wind_direction.response_time = "0.25 s"
         wind_direction.accuracy = "+/- 3.0 degrees"
         wind_direction.resolution = "1 degree"
@@ -384,7 +405,7 @@ def convert2nc(srcpath, outpath):
         air_temperature.standard_name = "air_temperature"
         air_temperature.short_name = "AT"
         air_temperature.measurement_type = "measured"
-        air_temperature.units = "celsius"
+        air_temperature.units = "degC"
         air_temperature.range =  "-52 ... +60 °C (-60 ... +140 °F)"
         # air_temperature.valid_range = -5.f, 40.f;
         air_temperature.accuracy = "+/- 0.3 celsius"
@@ -405,7 +426,7 @@ def convert2nc(srcpath, outpath):
         relative_humidity.is_dead = 0
         relative_humidity[:] = rehu
 
-        rain_intensity = dataset.createVariable("RAIN", "f8", ("time", "lon", "lat",))
+        rain_intensity = dataset.createVariable("rain_intensity", "f8", ("time", "lon", "lat",))
         rain_intensity.long_name = "Rain Intensity"
         rain_intensity.standard_name = "rain_intensity"
         rain_intensity.short_name = "RAIN"
@@ -415,61 +436,61 @@ def convert2nc(srcpath, outpath):
         rain_intensity.is_dead = "N/A"
         rain_intensity[:] = rain
 
-        hail_intensity = dataset.createVariable("HAIL", "f8", ("time", "lon", "lat",))
+        hail_intensity = dataset.createVariable("hail_intensity", "f8", ("time", "lon", "lat",))
         hail_intensity.long_name = "Hail Intensity"
         hail_intensity.standard_name = "hail_intensity"
         hail_intensity.short_name = "HAIL"
         hail_intensity.measurement_type = "measured"
-        hail_intensity.units = "1 hit/in^2"
+        hail_intensity.units = "hits/h"
         hail_intensity.is_dead = "N/A"
         hail_intensity[:] = hail
 
-        battery_voltage = dataset.createVariable("BATTV", "f8", ("time", "lon", "lat",))
+        battery_voltage = dataset.createVariable("battery", "f8", ("time", "lon", "lat",))
         battery_voltage.long_name = "Battery"
         battery_voltage.standard_name = "battery"
         battery_voltage.short_name = "BATTV"
         battery_voltage.measurement_type = "measured"
-        battery_voltage.units = "volts"
+        battery_voltage.units = "raw"
         battery_voltage.is_dead = 0
         battery_voltage[:] = battv
 
-        instrument_heading = dataset.createVariable("platform_heading", "f8", ("time", "lon", "lat",))
+        instrument_heading = dataset.createVariable("heading", "f8", ("time", "lon", "lat",))
         instrument_heading.long_name = "Platform Heading"
         instrument_heading.standard_name = "platform_heading"
         instrument_heading.short_name = "HEADING"
-        instrument_heading.units = "degrees" #magnetic
+        instrument_heading.units = "deg" #magnetic
         instrument_heading.measurement_type = "measured"
         instrument_heading.is_dead = "N/A"
         instrument_heading[:] = insthead
 
-        instrument_pitch = dataset.createVariable("platform_pitch", "f8", ("time", "lon", "lat",))
+        instrument_pitch = dataset.createVariable("pitch", "f8", ("time", "lon", "lat",))
         instrument_pitch.long_name = "Platform Pitch"
         instrument_pitch.standard_name = "platform_pitch"
         instrument_pitch.short_name = "PITCH"
-        instrument_pitch.units = "degrees"
+        instrument_pitch.units = "deg"
         instrument_pitch.measurement_type = "measured"
         instrument_pitch.is_dead = "N/A"
         instrument_pitch[:] = instpitch
 
-        instrument_roll = dataset.createVariable("platform_roll", "f8", ("time", "lon", "lat",))
+        instrument_roll = dataset.createVariable("roll", "f8", ("time", "lon", "lat",))
         instrument_roll.long_name = "Platform Roll"
         instrument_roll.standard_name = "platform_roll"
         instrument_roll.short_name = "ROLL"
-        instrument_roll.units = "degrees"
+        instrument_roll.units = "deg"
         instrument_roll.measurement_type = "measured"
         instrument_roll.is_dead = "N/A"
         instrument_roll[:] = instroll
 
-        instrument_pressure = dataset.createVariable("platform_pres", "f8", ("time", "lon", "lat",))
+        instrument_pressure = dataset.createVariable("pres", "f8", ("time", "lon", "lat",))
         instrument_pressure.long_name = "Platform Pressure"
-        instrument_pressure.standard_name = "platform_pres"
-        instrument_pressure.short_name = "platform_pres"
+        instrument_pressure.standard_name = "platform_pressure"
+        instrument_pressure.short_name = "pres"
         instrument_pressure.units = "kPa"
         instrument_pressure.measurement_type = "measured"
         instrument_pressure.is_dead = "N/A"
         instrument_pressure[:] = instpres
 
-        east_velocity1 = dataset.createVariable("u", "f8", ("time", "lon", "lat",))
+        east_velocity1 = dataset.createVariable("current_u", "f8", ("time", "lon", "lat",))
         east_velocity1.long_name = "Eastward Sea Water Velocity"
         east_velocity1.standard_name = "eastward_sea_water_velocity"
         east_velocity1.short_name = "u"
@@ -478,7 +499,7 @@ def convert2nc(srcpath, outpath):
         east_velocity1.is_dead = "N/A"
         east_velocity1[:] = totalevb
 
-        north_velocity1 = dataset.createVariable("v", "f8", ("time", "lon", "lat",))
+        north_velocity1 = dataset.createVariable("current_v", "f8", ("time", "lon", "lat",))
         north_velocity1.long_name = "Northward Sea Water Velocity"
         north_velocity1.standard_name = "northward_sea_water_velocity"
         north_velocity1.short_name = "v"
@@ -517,14 +538,14 @@ def convert2nc(srcpath, outpath):
         mean_current_velocity_direction.units = "degrees magnetic"
         mean_current_velocity_direction[:] = mcdir
 
-        percent_good_bin_01 = dataset.createVariable("PGB01", "f8", ("time", "lon", "lat",))
-        percent_good_bin_01.long_name = "Percent Good Bin 01"
-        percent_good_bin_01.standard_name = "percent_good_bin_01"
-        percent_good_bin_01.short_name = "PGB01"
+        percent_good_bin_01 = dataset.createVariable("PGB", "f8", ("time", "lon", "lat",))
+        percent_good_bin_01.long_name = "Percent Good Bin"
+        percent_good_bin_01.standard_name = "percent_good_bin"
+        percent_good_bin_01.short_name = "PGB"
         percent_good_bin_01.units = "percent"
         percent_good_bin_01.measurement_type = "measured"
         percent_good_bin_01.is_dead = "N/A"
-        percent_good_bin_01[:] = pgb1
+        percent_good_bin_01[:] = totalpgb
 
         '''
         percent_good_bin_02 = dataset.createVariable("PGB02", "f8", ("time", "lon", "lat",))
@@ -698,33 +719,34 @@ def convert2nc(srcpath, outpath):
         percent_good_bin_20.is_dead = "N/A"
         percent_good_bin_20[:] = pgb20
         '''
-        echo_amp_1_bin_1 = dataset.createVariable("EA01B01", "f8", ("time", "lon", "lat",))
-        echo_amp_1_bin_1.long_name = "Echo Amplitude 01 Bin 01"
-        echo_amp_1_bin_1.standard_name = "echo_amplitude_01_bin_01"
-        echo_amp_1_bin_1.short_name = "EA01B01"
-        echo_amp_1_bin_1.units = "counts"
-        echo_amp_1_bin_1.measurement_type = "measured"
-        echo_amp_1_bin_1.is_dead = "N/A"
-        echo_amp_1_bin_1[:] = EA01B01
+        echo_amp_1_bins = dataset.createVariable("EA01B", "f8", ("time", "lon", "lat",))
+        echo_amp_1_bins.long_name = "Echo Amplitude 01 Bins"
+        echo_amp_1_bins.standard_name = "echo_amplitude_01_bins"
+        echo_amp_1_bins.short_name = "EA01B"
+        echo_amp_1_bins.units = "counts"
+        echo_amp_1_bins.measurement_type = "measured"
+        echo_amp_1_bins.is_dead = "N/A"
+        echo_amp_1_bins[:] = totalEA01
+        
+        echo_amp_2_bins = dataset.createVariable("EA02B", "f8", ("time", "lon", "lat",))
+        echo_amp_2_bins.long_name = "Echo Amplitude 02 Bins"
+        echo_amp_2_bins.standard_name = "echo_amplitude_02"
+        echo_amp_2_bins.short_name = "EA02B"
+        echo_amp_2_bins.units = "counts"
+        echo_amp_2_bins.measurement_type = "measured"
+        echo_amp_2_bins.is_dead = "N/A"
+        echo_amp_2_bins[:] = totalEA02
+
+        echo_amp_3_bins = dataset.createVariable("EA03B", "f8", ("time", "lon", "lat",))
+        echo_amp_3_bins.long_name = "Echo Amplitude 03 Bins"
+        echo_amp_3_bins.standard_name = "echo_amplitude_03"
+        echo_amp_3_bins.short_name = "EA03B"
+        echo_amp_3_bins.units = "counts"
+        echo_amp_3_bins.measurement_type = "measured"
+        echo_amp_3_bins.is_dead = "N/A"
+        echo_amp_3_bins[:] = totalEA03
+
         '''
-        echo_amp_2_bin_1 = dataset.createVariable("EA02B01", "f8", ("time", "lon", "lat",))
-        echo_amp_2_bin_1.long_name = "Echo Amplitude 02 Bin 01"
-        echo_amp_2_bin_1.standard_name = "echo_amplitude_02_bin_01"
-        echo_amp_2_bin_1.short_name = "EA02B01"
-        echo_amp_2_bin_1.units = "counts"
-        echo_amp_2_bin_1.measurement_type = "measured"
-        echo_amp_2_bin_1.is_dead = "N/A"
-        echo_amp_2_bin_1[:] = EA02B01
-
-        echo_amp_3_bin_1 = dataset.createVariable("EA03B01", "f8", ("time", "lon", "lat",))
-        echo_amp_3_bin_1.long_name = "Echo Amplitude 03 Bin 01"
-        echo_amp_3_bin_1.standard_name = "echo_amplitude_03_bin_01"
-        echo_amp_3_bin_1.short_name = "EA03B01"
-        echo_amp_3_bin_1.units = "counts"
-        echo_amp_3_bin_1.measurement_type = "measured"
-        echo_amp_3_bin_1.is_dead = "N/A"
-        echo_amp_3_bin_1[:] = EA03B01
-
         echo_amp_1_bin_2 = dataset.createVariable("EA01B02", "f8", ("time", "lon", "lat",))
         echo_amp_1_bin_2.long_name = "Echo Amplitude 01 Bin 02"
         echo_amp_1_bin_2.standard_name = "echo_amplitude_01_bin_02"
