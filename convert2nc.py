@@ -169,15 +169,18 @@ def convert2nc(srcpath, outpath):
 
             instdepth.append((csvdf[14][index])), insthead.append((csvdf[15][index])), instpitch.append((csvdf[16][index]))
             instroll.append((csvdf[17][index])), instpres.append((csvdf[18][index]))
+           
+            evb1.append((csvdf[19][index])), nvb1.append((csvdf[20][index])), evb2.append((csvdf[21][index])), nvb2.append((csvdf[22][index]))
+            evb3.append((csvdf[23][index])), nvb3.append((csvdf[24][index])), evb4.append((csvdf[25][index])), nvb4.append((csvdf[26][index]))
+            evb5.append((csvdf[27][index])), nvb5.append((csvdf[28][index])), evb6.append((csvdf[29][index])), nvb6.append((csvdf[30][index]))
+            evb7.append((csvdf[31][index])), nvb7.append((csvdf[32][index])), evb8.append((csvdf[33][index])), nvb8.append((csvdf[34][index]))
+            evb9.append((csvdf[35][index])), nvb9.append((csvdf[36][index])), evb10.append((csvdf[37][index])), nvb10.append((csvdf[38][index]))
+            evb11.append((csvdf[39][index])), nvb11.append((csvdf[40][index])), evb12.append((csvdf[41][index])), nvb12.append((csvdf[42][index]))
+            evb13.append((csvdf[41][index])), nvb13.append((csvdf[44][index])), evb14.append((csvdf[45][index])), nvb14.append((csvdf[46][index]))
+            evb15.append((csvdf[45][index])), nvb15.append((csvdf[48][index])), evb16.append((csvdf[49][index])), nvb16.append((csvdf[50][index]))
+            evb17.append((csvdf[49][index])), nvb17.append((csvdf[52][index])), evb18.append((csvdf[53][index])), nvb18.append((csvdf[54][index]))
+            evb19.append((csvdf[51][index])), nvb19.append((csvdf[56][index])), evb20.append((csvdf[57][index])), nvb20.append((csvdf[58][index]))
 
-            i = 19
-            k = 20
-            for m in range(20):
-                totalevb.append(csvdf[i][index])
-                totalnvb.append(csvdf[k][index])
-                i += 2
-                k += 2
-            
             mcspd.append((csvdf[59][index])), mcdir.append((csvdf[60][index]))
 
             pgb1.append((csvdf[61][index])), pgb2.append((csvdf[62][index])), pgb3.append((csvdf[63][index]))
@@ -320,10 +323,10 @@ def convert2nc(srcpath, outpath):
         depth.comment = "Coordinate variable"
         depth[:] = instdepth
 
-        barometric_pressure = dataset.createVariable("PRES", "f8", ("time", "lon", "lat",))
+        barometric_pressure = dataset.createVariable("BP", "f8", ("time", "lon", "lat",))
         barometric_pressure.long_name = "Barometric Pressure"
         barometric_pressure.standard_name = "barometric_pressure"
-        barometric_pressure.short_name = "PRES"
+        barometric_pressure.short_name = "BP"
         # barometric_pressure.ancillary_variables = "barometric_pressure_qc"
         barometric_pressure.measurement_type = "measured"
         barometric_pressure.units = "hPa"
@@ -384,7 +387,7 @@ def convert2nc(srcpath, outpath):
         air_temperature.standard_name = "air_temperature"
         air_temperature.short_name = "AT"
         air_temperature.measurement_type = "measured"
-        air_temperature.units = "celsius"
+        air_temperature.units = "degC"
         air_temperature.range =  "-52 ... +60 °C (-60 ... +140 °F)"
         # air_temperature.valid_range = -5.f, 40.f;
         air_temperature.accuracy = "+/- 0.3 celsius"
@@ -409,7 +412,7 @@ def convert2nc(srcpath, outpath):
         rain_intensity.long_name = "Rain Intensity"
         rain_intensity.standard_name = "rain_intensity"
         rain_intensity.short_name = "RAIN"
-        rain_intensity.units = "in/h"
+        rain_intensity.units = "hit/h"
         rain_intensity.measurement_type = "measured"
         rain_intensity.range = "0 ... 200 mm/h"
         rain_intensity.is_dead = "N/A"
@@ -420,7 +423,7 @@ def convert2nc(srcpath, outpath):
         hail_intensity.standard_name = "hail_intensity"
         hail_intensity.short_name = "HAIL"
         hail_intensity.measurement_type = "measured"
-        hail_intensity.units = "1 hit/in^2"
+        hail_intensity.units = "hit/h"
         hail_intensity.is_dead = "N/A"
         hail_intensity[:] = hail
 
@@ -433,59 +436,401 @@ def convert2nc(srcpath, outpath):
         battery_voltage.is_dead = 0
         battery_voltage[:] = battv
 
-        instrument_heading = dataset.createVariable("platform_heading", "f8", ("time", "lon", "lat",))
+        instrument_heading = dataset.createVariable("heading", "f8", ("time", "lon", "lat",))
         instrument_heading.long_name = "Platform Heading"
-        instrument_heading.standard_name = "platform_heading"
-        instrument_heading.short_name = "HEADING"
-        instrument_heading.units = "degrees" #magnetic
+        instrument_heading.standard_name = "heading"
+        instrument_heading.short_name = "heading"
+        instrument_heading.units = "deg" #magnetic
         instrument_heading.measurement_type = "measured"
         instrument_heading.is_dead = "N/A"
         instrument_heading[:] = insthead
 
-        instrument_pitch = dataset.createVariable("platform_pitch", "f8", ("time", "lon", "lat",))
+        instrument_pitch = dataset.createVariable("pitch", "f8", ("time", "lon", "lat",))
         instrument_pitch.long_name = "Platform Pitch"
-        instrument_pitch.standard_name = "platform_pitch"
-        instrument_pitch.short_name = "PITCH"
-        instrument_pitch.units = "degrees"
+        instrument_pitch.standard_name = "pitch"
+        instrument_pitch.short_name = "pitch"
+        instrument_pitch.units = "deg"
         instrument_pitch.measurement_type = "measured"
         instrument_pitch.is_dead = "N/A"
         instrument_pitch[:] = instpitch
 
-        instrument_roll = dataset.createVariable("platform_roll", "f8", ("time", "lon", "lat",))
+        instrument_roll = dataset.createVariable("roll", "f8", ("time", "lon", "lat",))
         instrument_roll.long_name = "Platform Roll"
-        instrument_roll.standard_name = "platform_roll"
-        instrument_roll.short_name = "ROLL"
-        instrument_roll.units = "degrees"
+        instrument_roll.standard_name = "roll"
+        instrument_roll.short_name = "roll"
+        instrument_roll.units = "deg"
         instrument_roll.measurement_type = "measured"
         instrument_roll.is_dead = "N/A"
         instrument_roll[:] = instroll
 
-        instrument_pressure = dataset.createVariable("platform_pres", "f8", ("time", "lon", "lat",))
+        instrument_pressure = dataset.createVariable("pres", "f8", ("time", "lon", "lat",))
         instrument_pressure.long_name = "Platform Pressure"
-        instrument_pressure.standard_name = "platform_pres"
-        instrument_pressure.short_name = "platform_pres"
+        instrument_pressure.standard_name = "pressure"
+        instrument_pressure.short_name = "pres"
         instrument_pressure.units = "kPa"
         instrument_pressure.measurement_type = "measured"
         instrument_pressure.is_dead = "N/A"
         instrument_pressure[:] = instpres
 
-        east_velocity1 = dataset.createVariable("u", "f8", ("time", "lon", "lat",))
+        east_velocity1 = dataset.createVariable("current_u_01", "f8", ("time", "lon", "lat",))
         east_velocity1.long_name = "Eastward Sea Water Velocity"
         east_velocity1.standard_name = "eastward_sea_water_velocity"
         east_velocity1.short_name = "u"
         east_velocity1.units = "01 mm s-1"
         east_velocity1.measurement_type = "measured"
         east_velocity1.is_dead = "N/A"
-        east_velocity1[:] = totalevb
+        east_velocity1[:] = evb1
 
-        north_velocity1 = dataset.createVariable("v", "f8", ("time", "lon", "lat",))
+        north_velocity1 = dataset.createVariable("current_v_01", "f8", ("time", "lon", "lat",))
         north_velocity1.long_name = "Northward Sea Water Velocity"
         north_velocity1.standard_name = "northward_sea_water_velocity"
         north_velocity1.short_name = "v"
         north_velocity1.units = "01 mm s-1"
         north_velocity1.measurement_type = "measured"
         north_velocity1.is_dead = "N/A"
-        north_velocity1[:] = totalnvb
+        north_velocity1[:] = nvb1
+
+        east_velocity2 = dataset.createVariable("current_u_02", "f8", ("time", "lon", "lat",))
+        east_velocity2.long_name = "Eastward Sea Water Velocity"
+        east_velocity2.standard_name = "eastward_sea_water_velocity"
+        east_velocity2.short_name = "u"
+        east_velocity2.units = "01 mm s-1"
+        east_velocity2.measurement_type = "measured"
+        east_velocity2.is_dead = "N/A"
+        east_velocity2[:] = evb2
+
+        north_velocity2 = dataset.createVariable("current_v_02", "f8", ("time", "lon", "lat",))
+        north_velocity2.long_name = "Northward Sea Water Velocity"
+        north_velocity2.standard_name = "northward_sea_water_velocity"
+        north_velocity2.short_name = "v"
+        north_velocity2.units = "01 mm s-1"
+        north_velocity2.measurement_type = "measured"
+        north_velocity2.is_dead = "N/A"
+        north_velocity2[:] = nvb2
+
+        east_velocity3 = dataset.createVariable("current_u_03", "f8", ("time", "lon", "lat",))
+        east_velocity3.long_name = "Eastward Sea Water Velocity"
+        east_velocity3.standard_name = "eastward_sea_water_velocity"
+        east_velocity3.short_name = "u"
+        east_velocity3.units = "01 mm s-1"
+        east_velocity3.measurement_type = "measured"
+        east_velocity3.is_dead = "N/A"
+        east_velocity3[:] = evb3
+
+        north_velocity3 = dataset.createVariable("current_v_03", "f8", ("time", "lon", "lat",))
+        north_velocity3.long_name = "Northward Sea Water Velocity"
+        north_velocity3.standard_name = "northward_sea_water_velocity"
+        north_velocity3.short_name = "v"
+        north_velocity3.units = "01 mm s-1"
+        north_velocity3.measurement_type = "measured"
+        north_velocity3.is_dead = "N/A"
+        north_velocity3[:] = nvb3
+
+        east_velocity4 = dataset.createVariable("current_u_04", "f8", ("time", "lon", "lat",))
+        east_velocity4.long_name = "Eastward Sea Water Velocity"
+        east_velocity4.standard_name = "eastward_sea_water_velocity"
+        east_velocity4.short_name = "u"
+        east_velocity4.units = "01 mm s-1"
+        east_velocity4.measurement_type = "measured"
+        east_velocity4.is_dead = "N/A"
+        east_velocity4[:] = evb4
+
+        north_velocity4 = dataset.createVariable("current_v_04", "f8", ("time", "lon", "lat",))
+        north_velocity4.long_name = "Northward Sea Water Velocity"
+        north_velocity4.standard_name = "northward_sea_water_velocity"
+        north_velocity4.short_name = "v"
+        north_velocity4.units = "01 mm s-1"
+        north_velocity4.measurement_type = "measured"
+        north_velocity4.is_dead = "N/A"
+        north_velocity4[:] = nvb4
+
+        east_velocity5 = dataset.createVariable("current_u_05", "f8", ("time", "lon", "lat",))
+        east_velocity5.long_name = "Eastward Sea Water Velocity"
+        east_velocity5.standard_name = "eastward_sea_water_velocity"
+        east_velocity5.short_name = "u"
+        east_velocity5.units = "01 mm s-1"
+        east_velocity5.measurement_type = "measured"
+        east_velocity5.is_dead = "N/A"
+        east_velocity5[:] = evb5
+
+        north_velocity5 = dataset.createVariable("current_v_05", "f8", ("time", "lon", "lat",))
+        north_velocity5.long_name = "Northward Sea Water Velocity"
+        north_velocity5.standard_name = "northward_sea_water_velocity"
+        north_velocity5.short_name = "v"
+        north_velocity5.units = "01 mm s-1"
+        north_velocity5.measurement_type = "measured"
+        north_velocity5.is_dead = "N/A"
+        north_velocity5[:] = nvb5
+
+        east_velocity6 = dataset.createVariable("current_u_06", "f8", ("time", "lon", "lat",))
+        east_velocity6.long_name = "Eastward Sea Water Velocity"
+        east_velocity6.standard_name = "eastward_sea_water_velocity"
+        east_velocity6.short_name = "u"
+        east_velocity6.units = "01 mm s-1"
+        east_velocity6.measurement_type = "measured"
+        east_velocity6.is_dead = "N/A"
+        east_velocity6[:] = evb6
+
+        north_velocity6 = dataset.createVariable("current_v_06", "f8", ("time", "lon", "lat",))
+        north_velocity6.long_name = "Northward Sea Water Velocity"
+        north_velocity6.standard_name = "northward_sea_water_velocity"
+        north_velocity6.short_name = "v"
+        north_velocity6.units = "01 mm s-1"
+        north_velocity6.measurement_type = "measured"
+        north_velocity6.is_dead = "N/A"
+        north_velocity6[:] = nvb6
+
+        east_velocity7 = dataset.createVariable("current_u_07", "f8", ("time", "lon", "lat",))
+        east_velocity7.long_name = "Eastward Sea Water Velocity"
+        east_velocity7.standard_name = "eastward_sea_water_velocity"
+        east_velocity7.short_name = "u"
+        east_velocity7.units = "01 mm s-1"
+        east_velocity7.measurement_type = "measured"
+        east_velocity7.is_dead = "N/A"
+        east_velocity7[:] = evb7
+
+        north_velocity7 = dataset.createVariable("current_v_07", "f8", ("time", "lon", "lat",))
+        north_velocity7.long_name = "Northward Sea Water Velocity"
+        north_velocity7.standard_name = "northward_sea_water_velocity"
+        north_velocity7.short_name = "v"
+        north_velocity7.units = "01 mm s-1"
+        north_velocity7.measurement_type = "measured"
+        north_velocity7.is_dead = "N/A"
+        north_velocity7[:] = nvb7
+
+        east_velocity8 = dataset.createVariable("current_u_08", "f8", ("time", "lon", "lat",))
+        east_velocity8.long_name = "Eastward Sea Water Velocity"
+        east_velocity8.standard_name = "eastward_sea_water_velocity"
+        east_velocity8.short_name = "u"
+        east_velocity8.units = "01 mm s-1"
+        east_velocity8.measurement_type = "measured"
+        east_velocity8.is_dead = "N/A"
+        east_velocity8[:] = evb8
+
+        north_velocity8 = dataset.createVariable("current_v_08", "f8", ("time", "lon", "lat",))
+        north_velocity8.long_name = "Northward Sea Water Velocity"
+        north_velocity8.standard_name = "northward_sea_water_velocity"
+        north_velocity8.short_name = "v"
+        north_velocity8.units = "01 mm s-1"
+        north_velocity8.measurement_type = "measured"
+        north_velocity8.is_dead = "N/A"
+        north_velocity8[:] = nvb8
+
+        east_velocity9 = dataset.createVariable("current_u_09", "f8", ("time", "lon", "lat",))
+        east_velocity9.long_name = "Eastward Sea Water Velocity"
+        east_velocity9.standard_name = "eastward_sea_water_velocity"
+        east_velocity9.short_name = "u"
+        east_velocity9.units = "01 mm s-1"
+        east_velocity9.measurement_type = "measured"
+        east_velocity9.is_dead = "N/A"
+        east_velocity9[:] = evb9
+
+        north_velocity9 = dataset.createVariable("current_v_09", "f8", ("time", "lon", "lat",))
+        north_velocity9.long_name = "Northward Sea Water Velocity"
+        north_velocity9.standard_name = "northward_sea_water_velocity"
+        north_velocity9.short_name = "v"
+        north_velocity9.units = "01 mm s-1"
+        north_velocity9.measurement_type = "measured"
+        north_velocity9.is_dead = "N/A"
+        north_velocity9[:] = nvb9
+
+        east_velocity10 = dataset.createVariable("current_u_10", "f8", ("time", "lon", "lat",))
+        east_velocity10.long_name = "Eastward Sea Water Velocity"
+        east_velocity10.standard_name = "eastward_sea_water_velocity"
+        east_velocity10.short_name = "u"
+        east_velocity10.units = "01 mm s-1"
+        east_velocity10.measurement_type = "measured"
+        east_velocity10.is_dead = "N/A"
+        east_velocity10[:] = evb10
+
+        north_velocity10 = dataset.createVariable("current_v_10", "f8", ("time", "lon", "lat",))
+        north_velocity10.long_name = "Northward Sea Water Velocity"
+        north_velocity10.standard_name = "northward_sea_water_velocity"
+        north_velocity10.short_name = "v"
+        north_velocity10.units = "01 mm s-1"
+        north_velocity10.measurement_type = "measured"
+        north_velocity10.is_dead = "N/A"
+        north_velocity10[:] = nvb10
+
+        east_velocity11 = dataset.createVariable("current_u_11", "f8", ("time", "lon", "lat",))
+        east_velocity11.long_name = "Eastward Sea Water Velocity"
+        east_velocity11.standard_name = "eastward_sea_water_velocity"
+        east_velocity11.short_name = "u"
+        east_velocity11.units = "01 mm s-1"
+        east_velocity11.measurement_type = "measured"
+        east_velocity11.is_dead = "N/A"
+        east_velocity11[:] = evb11
+
+        north_velocity11 = dataset.createVariable("current_v_11", "f8", ("time", "lon", "lat",))
+        north_velocity11.long_name = "Northward Sea Water Velocity"
+        north_velocity11.standard_name = "northward_sea_water_velocity"
+        north_velocity11.short_name = "v"
+        north_velocity11.units = "01 mm s-1"
+        north_velocity11.measurement_type = "measured"
+        north_velocity11.is_dead = "N/A"
+        north_velocity11[:] = nvb11
+
+        east_velocity12 = dataset.createVariable("current_u_12", "f8", ("time", "lon", "lat",))
+        east_velocity12.long_name = "Eastward Sea Water Velocity"
+        east_velocity12.standard_name = "eastward_sea_water_velocity"
+        east_velocity12.short_name = "u"
+        east_velocity12.units = "01 mm s-1"
+        east_velocity12.measurement_type = "measured"
+        east_velocity12.is_dead = "N/A"
+        east_velocity12[:] = evb12
+
+        north_velocity12 = dataset.createVariable("current_v_12", "f8", ("time", "lon", "lat",))
+        north_velocity12.long_name = "Northward Sea Water Velocity"
+        north_velocity12.standard_name = "northward_sea_water_velocity"
+        north_velocity12.short_name = "v"
+        north_velocity12.units = "01 mm s-1"
+        north_velocity12.measurement_type = "measured"
+        north_velocity12.is_dead = "N/A"
+        north_velocity12[:] = nvb12
+
+        east_velocity13 = dataset.createVariable("current_u_13", "f8", ("time", "lon", "lat",))
+        east_velocity13.long_name = "Eastward Sea Water Velocity"
+        east_velocity13.standard_name = "eastward_sea_water_velocity"
+        east_velocity13.short_name = "u"
+        east_velocity13.units = "01 mm s-1"
+        east_velocity13.measurement_type = "measured"
+        east_velocity13.is_dead = "N/A"
+        east_velocity13[:] = evb13
+
+        north_velocity13 = dataset.createVariable("current_v_13", "f8", ("time", "lon", "lat",))
+        north_velocity13.long_name = "Northward Sea Water Velocity"
+        north_velocity13.standard_name = "northward_sea_water_velocity"
+        north_velocity13.short_name = "v"
+        north_velocity13.units = "01 mm s-1"
+        north_velocity13.measurement_type = "measured"
+        north_velocity13.is_dead = "N/A"
+        north_velocity13[:] = nvb13
+
+        east_velocity14 = dataset.createVariable("current_u_14", "f8", ("time", "lon", "lat",))
+        east_velocity14.long_name = "Eastward Sea Water Velocity"
+        east_velocity14.standard_name = "eastward_sea_water_velocity"
+        east_velocity14.short_name = "u"
+        east_velocity14.units = "01 mm s-1"
+        east_velocity14.measurement_type = "measured"
+        east_velocity14.is_dead = "N/A"
+        east_velocity14[:] = evb14
+
+        north_velocity14 = dataset.createVariable("current_v_14", "f8", ("time", "lon", "lat",))
+        north_velocity14.long_name = "Northward Sea Water Velocity"
+        north_velocity14.standard_name = "northward_sea_water_velocity"
+        north_velocity14.short_name = "v"
+        north_velocity14.units = "01 mm s-1"
+        north_velocity14.measurement_type = "measured"
+        north_velocity14.is_dead = "N/A"
+        north_velocity14[:] = nvb14
+
+        east_velocity15 = dataset.createVariable("current_u_15", "f8", ("time", "lon", "lat",))
+        east_velocity15.long_name = "Eastward Sea Water Velocity"
+        east_velocity15.standard_name = "eastward_sea_water_velocity"
+        east_velocity15.short_name = "u"
+        east_velocity15.units = "01 mm s-1"
+        east_velocity15.measurement_type = "measured"
+        east_velocity15.is_dead = "N/A"
+        east_velocity15[:] = evb15
+
+        north_velocity15 = dataset.createVariable("current_v_15", "f8", ("time", "lon", "lat",))
+        north_velocity15.long_name = "Northward Sea Water Velocity"
+        north_velocity15.standard_name = "northward_sea_water_velocity"
+        north_velocity15.short_name = "v"
+        north_velocity15.units = "01 mm s-1"
+        north_velocity15.measurement_type = "measured"
+        north_velocity15.is_dead = "N/A"
+        north_velocity15[:] = nvb15
+
+        east_velocity16 = dataset.createVariable("current_u_16", "f8", ("time", "lon", "lat",))
+        east_velocity16.long_name = "Eastward Sea Water Velocity"
+        east_velocity16.standard_name = "eastward_sea_water_velocity"
+        east_velocity16.short_name = "u"
+        east_velocity16.units = "01 mm s-1"
+        east_velocity16.measurement_type = "measured"
+        east_velocity16.is_dead = "N/A"
+        east_velocity16[:] = evb16
+
+        north_velocity16 = dataset.createVariable("current_v_16", "f8", ("time", "lon", "lat",))
+        north_velocity16.long_name = "Northward Sea Water Velocity"
+        north_velocity16.standard_name = "northward_sea_water_velocity"
+        north_velocity16.short_name = "v"
+        north_velocity16.units = "01 mm s-1"
+        north_velocity16.measurement_type = "measured"
+        north_velocity16.is_dead = "N/A"
+        north_velocity16[:] = nvb16
+
+        east_velocity17 = dataset.createVariable("current_u_17", "f8", ("time", "lon", "lat",))
+        east_velocity17.long_name = "Eastward Sea Water Velocity"
+        east_velocity17.standard_name = "eastward_sea_water_velocity"
+        east_velocity17.short_name = "u"
+        east_velocity17.units = "01 mm s-1"
+        east_velocity17.measurement_type = "measured"
+        east_velocity17.is_dead = "N/A"
+        east_velocity17[:] = evb17
+
+        north_velocity17 = dataset.createVariable("current_v_17", "f8", ("time", "lon", "lat",))
+        north_velocity17.long_name = "Northward Sea Water Velocity"
+        north_velocity17.standard_name = "northward_sea_water_velocity"
+        north_velocity17.short_name = "v"
+        north_velocity17.units = "01 mm s-1"
+        north_velocity17.measurement_type = "measured"
+        north_velocity17.is_dead = "N/A"
+        north_velocity17[:] = nvb17
+
+        east_velocity18 = dataset.createVariable("current_u_18", "f8", ("time", "lon", "lat",))
+        east_velocity18.long_name = "Eastward Sea Water Velocity"
+        east_velocity18.standard_name = "eastward_sea_water_velocity"
+        east_velocity18.short_name = "u"
+        east_velocity18.units = "01 mm s-1"
+        east_velocity18.measurement_type = "measured"
+        east_velocity18.is_dead = "N/A"
+        east_velocity18[:] = evb18
+
+        north_velocity18 = dataset.createVariable("current_v_18", "f8", ("time", "lon", "lat",))
+        north_velocity18.long_name = "Northward Sea Water Velocity"
+        north_velocity18.standard_name = "northward_sea_water_velocity"
+        north_velocity18.short_name = "v"
+        north_velocity18.units = "01 mm s-1"
+        north_velocity18.measurement_type = "measured"
+        north_velocity18.is_dead = "N/A"
+        north_velocity18[:] = nvb18
+
+        east_velocity19 = dataset.createVariable("current_u_19", "f8", ("time", "lon", "lat",))
+        east_velocity19.long_name = "Eastward Sea Water Velocity"
+        east_velocity19.standard_name = "eastward_sea_water_velocity"
+        east_velocity19.short_name = "u"
+        east_velocity19.units = "01 mm s-1"
+        east_velocity19.measurement_type = "measured"
+        east_velocity19.is_dead = "N/A"
+        east_velocity19[:] = evb19
+
+        north_velocity19 = dataset.createVariable("current_v_19", "f8", ("time", "lon", "lat",))
+        north_velocity19.long_name = "Northward Sea Water Velocity"
+        north_velocity19.standard_name = "northward_sea_water_velocity"
+        north_velocity19.short_name = "v"
+        north_velocity19.units = "01 mm s-1"
+        north_velocity19.measurement_type = "measured"
+        north_velocity19.is_dead = "N/A"
+        north_velocity19[:] = nvb19
+
+        east_velocity20 = dataset.createVariable("current_u_20", "f8", ("time", "lon", "lat",))
+        east_velocity20.long_name = "Eastward Sea Water Velocity"
+        east_velocity20.standard_name = "eastward_sea_water_velocity"
+        east_velocity20.short_name = "u"
+        east_velocity20.units = "01 mm s-1"
+        east_velocity20.measurement_type = "measured"
+        east_velocity20.is_dead = "N/A"
+        east_velocity20[:] = evb20
+
+        north_velocity20 = dataset.createVariable("current_v_20", "f8", ("time", "lon", "lat",))
+        north_velocity20.long_name = "Northward Sea Water Velocity"
+        north_velocity20.standard_name = "northward_sea_water_velocity"
+        north_velocity20.short_name = "v"
+        north_velocity20.units = "01 mm s-1"
+        north_velocity20.measurement_type = "measured"
+        north_velocity20.is_dead = "N/A"
+        north_velocity20[:] = nvb20
         
         mean_current_velocity_magnitude = dataset.createVariable("MCSPD", "f8", ("time", "lon", "lat",))
         mean_current_velocity_magnitude.long_name = "Mean Current Speed"
@@ -526,7 +871,6 @@ def convert2nc(srcpath, outpath):
         percent_good_bin_01.is_dead = "N/A"
         percent_good_bin_01[:] = pgb1
 
-        '''
         percent_good_bin_02 = dataset.createVariable("PGB02", "f8", ("time", "lon", "lat",))
         percent_good_bin_02.long_name = "Percent Good Bin 02"
         percent_good_bin_02.standard_name = "percent_good_bin_02"
@@ -697,7 +1041,7 @@ def convert2nc(srcpath, outpath):
         percent_good_bin_20.measurement_type = "measured"
         percent_good_bin_20.is_dead = "N/A"
         percent_good_bin_20[:] = pgb20
-        '''
+        
         echo_amp_1_bin_1 = dataset.createVariable("EA01B01", "f8", ("time", "lon", "lat",))
         echo_amp_1_bin_1.long_name = "Echo Amplitude 01 Bin 01"
         echo_amp_1_bin_1.standard_name = "echo_amplitude_01_bin_01"
@@ -706,7 +1050,7 @@ def convert2nc(srcpath, outpath):
         echo_amp_1_bin_1.measurement_type = "measured"
         echo_amp_1_bin_1.is_dead = "N/A"
         echo_amp_1_bin_1[:] = EA01B01
-        '''
+        
         echo_amp_2_bin_1 = dataset.createVariable("EA02B01", "f8", ("time", "lon", "lat",))
         echo_amp_2_bin_1.long_name = "Echo Amplitude 02 Bin 01"
         echo_amp_2_bin_1.standard_name = "echo_amplitude_02_bin_01"
@@ -1237,7 +1581,7 @@ def convert2nc(srcpath, outpath):
         echo_amp_3_bin_20.measurement_type = "measured"
         echo_amp_3_bin_20.is_dead = "N/A"
         echo_amp_3_bin_20[:] = EA03B20
-        '''
+
         # print(dataset.variables)
         dataset.close()
         print(dataset.file_format)
