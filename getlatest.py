@@ -22,7 +22,7 @@ def csv2json2send(payload):
     print(r.status_code, r.reason)
 
 def doublechecker(src, currentdate):
-    
+
     srcdate = src+"latestjsonfile.txt"
     contents = ""
     if os.path.isfile(srcdate):
@@ -30,7 +30,7 @@ def doublechecker(src, currentdate):
             contents = f.read()
             print(type(contents), type(currentdate))
             print(contents, currentdate)
-            
+
             if (contents == currentdate):
                 print("the latest date is already posted.")
                 f.close()
@@ -42,7 +42,7 @@ def doublechecker(src, currentdate):
                     f.write(currentdate)
                     f.close()
                 return False
-    
+
     else:
         print("file doesn't exist, creating and posting the new file")
         with open(srcdate, 'w') as f:
@@ -54,7 +54,7 @@ def fetchcurrentFiles(path):
 
     sutronurl = "http://sutronwin.com/goesweb/uvidock/"
     sutronurl2 = "http://sutronwin.com/goesweb/uvidock/?C=N;O=D"
-    
+
     latest_data = ""
 
     timedelta = ["000050", "000650", "001250", "001850", "002450", "003050", "003650", "004250", "004850", "005450",
@@ -81,7 +81,7 @@ def fetchcurrentFiles(path):
                  "210050", "210650", "211250", "211850", "212450", "213050", "213650", "214250", "214850", "215450",
                  "220050", "220650", "221250", "221850", "222450", "223050", "223650", "224250", "224850", "225450",
                  "230050", "230650", "231250", "231850", "232450", "233050", "233650", "234250", "234850", "235450"]
-    
+
     current_date = datetime.datetime.utcnow()
     current_julianyear = current_date.timetuple().tm_year
     current_julianday = current_date.timetuple().tm_yday
@@ -104,7 +104,7 @@ def fetchcurrentFiles(path):
         filename = prefilename + i
 
         if(str_past_time < i):
-            
+
             if(str_current_time > i):
                 print(i)
                 #fullURL = "http://sutronwin.com/goesweb/uvidock/virgin_islands-19294-135450" #TEST file
@@ -131,14 +131,14 @@ def fetchcurrentFiles(path):
 
                     except:
                         print("no file found")
-    
+
     latest_data = latest_data.replace('"',"")
     latest_data = latest_data.replace("\n", "")
     latest_data = latest_data.split(',')
-    
+
     print(type(latest_data))
     print(latest_data)
-    
+
     columns = ["Station", "Date(GMT)", "Time(GMT)", "WSPD(kts)",
                "WDIR(degM)", "GST(kts)", "PRES(mm)", "ATMP(degC)", "RH(percent)", "RAIN(inches/hour)",
                "HAIL(hits/in^2/hour)", "BATTV(Volts)", "InstDEPTH(0.1meter)", "InstHEADING(degM)",
@@ -175,11 +175,11 @@ def fetchcurrentFiles(path):
                "EA01B18(counts)", "EA02B18(counts)", "EA03B18(counts)",
                "EA01B19(counts)", "EA02B19(counts)", "EA03B19(counts)",
                "EA01B20(counts)", "EA02B20(counts)", "EA03B20(counts)"]
-    
+
     L = [latest_data]
     df = pd.DataFrame(L, columns=columns)
     print(df.shape)
-    
+
     time = df["Date(GMT)"][0]+" "+df['Time(GMT)'][0]
     time = parser.parse(time).strftime("%Y-%m-%d %H:%M:%S")
     windspeed = float("{0:.2f}".format(float(df["WSPD(kts)"][0])))
@@ -187,7 +187,7 @@ def fetchcurrentFiles(path):
     temperature = float("{0:.2f}".format(float(df["ATMP(degC)"][0])))
     currentspeed = (df["MCSPD(kts)"][0]).replace("'", "")
     currentdir = (df["MCDIR(degM)"][0]).replace("'","")
-        
+
     if(currentspeed == ""):
         currentspeed = -1
         currentdir = -1
@@ -209,12 +209,12 @@ def fetchcurrentFiles(path):
     print("raw json", jsonskeleton)
 
     gatekeeper = doublechecker(srcpath, time)
-    
+
     if (gatekeeper == False):
         csv2json2send(jsonskeleton)
 
 if __name__ == '__main__':
-    srcpath = "/home/caricoos/tmp/jsondata/"
+    srcpath = "/home/abreton/tmp/jsondata/"
 
     if not os.path.exists(srcpath):
         os.makedirs(srcpath)
