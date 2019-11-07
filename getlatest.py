@@ -13,7 +13,7 @@ def latestFileinDirectory(srcpath):
     return latest_file
 
 def csv2json2send(payload):
-    url = "http://ocovipreview.azurewebsites.net/station/data"
+    url = "http://ocovi.azurewebsites.net//station/data"
     header = {"Content-type": "application/json"}
     payload = [payload]
     jsonpayload = json.dumps(payload, separators=(',', ':'))
