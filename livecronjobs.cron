@@ -1,0 +1,1 @@
+*/2 * * * * /home/caricoos/anaconda3/bin/python /home/caricoos/scripts/python/livescripts/getlatest.py
