@@ -1,6 +1,7 @@
 #alphabranch
 import os
-from datetime import datetime, timedelta
+from datetime import date, timedelta, datetime
+
 import datetime
 import requests
 import glob
@@ -192,7 +193,7 @@ def process_csv(src, out, log):
     log_file_path = log + "vi_stt_crownbay_" + str(pastdays_julianyear).zfill(2) + str(pastdays_julianday).zfill(3) + "_log.txt"
     f = open(log_file_path, 'w+')
     f.write("URL = http://sutronwin.com/goesweb/uvidock/?C=N;O=D\n")
-    csv_directory = sorted(glob.glob(src + "*.csv"))
+    csv_directory = sorted(glob.glob(src + "*.*"))
 
     columns = ["Station", "Date(GMT)", "Time(GMT)", "WSPD(kts)",
                "WDIR(degM)", "GST(kts)", "PRES(mm)", "ATMP(degC)", "RH(percent)", "RAIN(inches/hour)",
@@ -251,6 +252,12 @@ def process_csv(src, out, log):
         fmt_yday = str(parsedatetime.timetuple().tm_yday).zfill(3)
 
         if csvsize == 0:
+            '''fmt_yday = int(fmt_yday) - 1
+            fmt_date = datetime.datetime.strptime(fmt_date, '%m/%d/%Y').date()
+            fmt_date = fmt_date - datetime.timedelta(days=1)
+            fmt_date = str(fmt_date)'''
+
+
             print(csvname + " is empty, generating values....")
             f.write(csvname[:-4] + " no data present....\n")
 
@@ -262,7 +269,7 @@ def process_csv(src, out, log):
             csvdf = csvdf.append({'Station': 'CROWN BAY', 'Latitude': 18.331414, 'Longitude': -64.951350,
                                   'Date(GMT)': fmt_date, 'Time(GMT)': fmt_time}, ignore_index=True)
             csvdf = csvdf.fillna('NaN')
-            savenameformat = 'virgin_islands-' + str(fmt_year) + str(fmt_yday) + '-' + fmt_time.replace(':', '') + '.csv'
+            savenameformat = 'met.dopp.VI.CWB.' + str(fmt_year) + str(fmt_yday) + '.' + fmt_time.replace(':', '') + '.csv'
             csvdf.to_csv(out + savenameformat, index=False)
             none_count += 1
 
@@ -281,11 +288,13 @@ def process_csv(src, out, log):
             csvdf["Station"] = csvdf["Station"].replace("UVIDOCK", "CROWN BAY")
             # formatting and changing datetime
             strdate = csvdf['Date(GMT)'].iloc[0]
+            '''strdate = datetime.datetime.strptime(strdate, '%m/%d/%Y').date() + datetime.timedelta(days=1)
+            strdate = str(strdate)'''
             strtime = csvdf['Time(GMT)'].iloc[0]
             datetimeinGMT = parser.parse(strdate + ' ' + strtime)
             GMTdateinstr = str(datetimeinGMT)[:10]
             GMTtimeinstr = str(datetimeinGMT)[-8:]
-            formatteddate = datetime.datetime.strptime(GMTdateinstr, '%Y-%m-%d')
+            formatteddate = (datetime.datetime.strptime(GMTdateinstr, '%Y-%m-%d') )#+ timedelta(days=1))
             GMTformatteddate = datetime.date.strftime(formatteddate, "%m/%d/%Y")
             # datetime2julian = datetime.datetime.strptime(str(datetimeinGMT), '%Y-%m-%d %H:%M:%S')
             yearday = str(datetimeinGMT.timetuple().tm_yday).zfill(3)
@@ -295,8 +304,7 @@ def process_csv(src, out, log):
 
             # fills the rest of the blank columns with NaN
             csvdf = csvdf.fillna("NaN")
-            savenameformat = 'virgin_islands-' + str(datetimeinGMT)[2:-15] + yearday + '-' + GMTtimeinstr.replace(':',
-                                                                                                                  '') + '.csv'
+            savenameformat = 'met.dopp.VI.CWB.' + str(fmt_year) + str(fmt_yday) + '.' + fmt_time.replace(':', '') + '.csv'
             csvdf.to_csv(out + savenameformat, index=False)
             partial_count += 1
 
@@ -327,8 +335,7 @@ def process_csv(src, out, log):
 
             # fills the rest of the blank columns with NaN
             csvdf = csvdf.fillna("NaN")
-            savenameformat = 'virgin_islands-' + str(datetimeinGMT)[2:-15] + yearday + '-' + GMTtimeinstr.replace(':',
-                                                                                                            '') + '.csv'
+            savenameformat = 'met.dopp.VI.CWB.' + str(fmt_year) + str(fmt_yday) + '.' + fmt_time.replace(':', '') + '.csv'
             csvdf.to_csv(out + savenameformat, index=False)
             good_count += 1
     
@@ -344,8 +351,8 @@ def process_csv(src, out, log):
     #send email if the number of missing data is greater than the # assigned.
     if(total_bad > 30):
         print(log_file_path)
-        sendemail("cmesuvistt@gmail.com", "cmesuniversity123",
-                  log_file_path, "andyvp@live.com")
+        #sendemail("cmesuvistt@gmail.com", "cmesuniversity123",
+                  #log_file_path, "andyvp@live.com")
 
 def concat_csv(src, out):
 
@@ -359,7 +366,7 @@ def concat_csv(src, out):
     frame = pd.concat(list, axis=0, ignore_index=True)
     df = pd.DataFrame(frame)
     df = df.fillna("NaN")
-    df.to_csv(out+"vi_stt_crownbay_"+str(pastdays_julianyear).zfill(2)[2:]+str(pastdays_julianday).zfill(3)+".met.dopp.csv", index=None, header=True)
+    df.to_csv(out+"met.dopp.VI.CWB."+str(pastdays_julianyear).zfill(2)[2:]+str(pastdays_julianday).zfill(3)+".csv", index=None, header=True)
     #print(frame)
 
 if __name__ == '__main__':
@@ -370,28 +377,31 @@ if __name__ == '__main__':
     concatcsvDir = "/home/caricoos/ftp/concatcsvfolder/"
 
     #current_date = datetime.date.today()
-    pastdays = 1
 
-    current_date = datetime.datetime.utcnow()
-    current_julianyear = current_date.timetuple().tm_year
-    current_julianday = current_date.timetuple().tm_yday
-    pastdays_date = current_date - timedelta(days=pastdays)
-    pastdays_julianyear = pastdays_date.timetuple().tm_year
-    pastdays_julianday = pastdays_date.timetuple().tm_yday
-    tomorrowpastdays_date = pastdays_date + timedelta(days=1)
-    tomorrowpastdays_jyear = tomorrowpastdays_date.timetuple().tm_year
-    tomorrowpastdays_jday = tomorrowpastdays_date.timetuple().tm_yday
+    #pastdays = 1
 
-    y_ogDir = ogDir + str(pastdays_julianyear).zfill(2)[2:] + str(pastdays_julianday).zfill(3) + '/'
-    y_csvDir = csvDir + str(pastdays_julianyear).zfill(2)[2:] + str(pastdays_julianday).zfill(3) + '/'
+    for pastdays in range(411, 1, -1):
 
-    if not os.path.exists(csvDir):
-        os.makedirs(csvDir)
-        os.makedirs(ncDir)
-        os.makedirs(ogDir)
-        os.makedirs(logDir)
-        os.makedirs(concatcsvDir)
+        current_date = datetime.datetime.utcnow()
+        current_julianyear = current_date.timetuple().tm_year
+        current_julianday = current_date.timetuple().tm_yday
+        pastdays_date = current_date - timedelta(days=pastdays)
+        pastdays_julianyear = pastdays_date.timetuple().tm_year
+        pastdays_julianday = pastdays_date.timetuple().tm_yday
+        tomorrowpastdays_date = pastdays_date + timedelta(days=1)
+        tomorrowpastdays_jyear = tomorrowpastdays_date.timetuple().tm_year
+        tomorrowpastdays_jday = tomorrowpastdays_date.timetuple().tm_yday
 
-    fetchcurrentFiles(y_ogDir)
-    process_csv(y_ogDir, y_csvDir, logDir)
-    concat_csv(y_csvDir, concatcsvDir)
+        y_ogDir = ogDir + str(pastdays_julianyear).zfill(2)[2:] + str(pastdays_julianday).zfill(3) + '/'
+        y_csvDir = csvDir + str(pastdays_julianyear).zfill(2)[2:] + str(pastdays_julianday).zfill(3) + '/'
+
+        if not os.path.exists(csvDir):
+            os.makedirs(csvDir)
+            os.makedirs(ncDir)
+            os.makedirs(ogDir)
+            os.makedirs(logDir)
+            os.makedirs(concatcsvDir)
+
+        fetchcurrentFiles(y_ogDir)
+        process_csv(y_ogDir, y_csvDir, logDir)
+        concat_csv(y_csvDir, concatcsvDir)
