@@ -4,6 +4,7 @@ import datetime
 import glob
 import json
 import os
+import numpy as np
 
 import numpy as np
 import pandas as pd
@@ -84,7 +85,7 @@ def convert2nc(srcpath, outpath):
         latitude, longitude = csvdf[3][1], csvdf[4][1]
 
         time, wspd, wdir = [], [], []
-        gst, pres, atmp = [], [], []
+        gst, presv, atmp = [], [], []
         rehu, rain, hail = [], [], []
         battv, instdepth, insthead = [], [], []
         instpitch, instroll, instpres = [], [], []
@@ -164,7 +165,7 @@ def convert2nc(srcpath, outpath):
             time.append(float(nc_datetime))
 
             wspd.append((csvdf[5][index])), wdir.append((csvdf[6][index])), gst.append((csvdf[7][index]))
-            pres.append((csvdf[8][index])), atmp.append((csvdf[9][index])), rehu.append((csvdf[10][index]))
+            presv.append((csvdf[8][index])), atmp.append((csvdf[9][index])), rehu.append((csvdf[10][index]))
             rain.append((csvdf[11][index])), hail.append((csvdf[12][index])), battv.append((csvdf[13][index]))
 
             instdepth.append((csvdf[14][index])), insthead.append((csvdf[15][index])), instpitch.append((csvdf[16][index]))
@@ -217,19 +218,28 @@ def convert2nc(srcpath, outpath):
         print(totalnvb)
 
         dataset = Dataset(outpath + file[-25:-4] + ".nc", 'w', format="NETCDF4_CLASSIC")
-        dataset.project = "CARICOOS' Crown Bay Weather Station Project"
+        dataset.project = "CARICOOS"
         dataset.title = "Crown Bay Weather Station and ADCP Data."
         dataset.institution = "University of the Virgin Islands"
         dataset.institution_abbreviation = "UVI"
         dataset.institution_dept = "Center for Marine & Environmental Studies"
-        dataset.naming_authority = "UVI & CARICOOS"
-        dataset.authors = "University of the Virgin Islands"
+        dataset.naming_authority = "https://www.caricoos.org/"
+        dataset.authors = "Ocean Labs"
+        dataset.creator_institution = "University of the Virgin Islands"
+        dataset.creator_sector = "academic"
         dataset.creator_name = "Andy Breton"
+        dataset.creator_phone = "(340) 776-9200"
         dataset.creator_url = "https://www.uvi.edu/research/center-for-marine-environmental-studies/default.aspx"
-        dataset.creator_email = "<andy.bretonperalta@uvi.edu>;"
-        dataset.contributor_name = "Dr. Paul Jobsis (UVI), Dr. Doug Wilson (Caribbean Wind LLC), and Dr. Jorge Capella (CARICOOS)"
-        dataset.contributor_role = "CMES Director, Scientist, Data Manager & Compliance"
-        dataset.contributor_email = "pjobsis@uvi.edu, doug@coastaloceanobs.com, and jorge.capella@upr.edu"
+        dataset.creator_email = "andy.bretonperalta@uvi.edu"
+        dataset.creator_country = "United States Virgin Islands"
+        dataset.creator_state = "Virgin Islands (STT)"
+        dataset.creator_city = "Charlotte Amalie"
+        dataset.creator_address = "2 John Brewers Bay"
+        dataset.creator_postalcode = "00802-6004"
+        dataset.contributor_name = "Dr. Jorge Capella (CARICOOS)"
+        dataset.contributor_role = "DMAC, Scientist, & Compliance"
+        dataset.contributor_email = "jorge.capella@upr.edu"
+        dataset.contributor_url = "www.caricoos.org"
         dataset.source = "www.sutronwin.com/goesweb/uvidock/?C=N;O=D"
         dataset.license = "There are no restrictions placed on these data."
         dataset.citation = "The Department of Marine & Environmental Studies of UVI should be cited as the source of " \
@@ -241,16 +251,24 @@ def convert2nc(srcpath, outpath):
 
         dataset.station_name = "Crown Bay Marina Weather Station - Crown Bay Marina, Charlotte Amalie West, St Thomas 00802"
         dataset.station_id = "Virgin Islands (STT) CrownBay Weather Station w/ ADCP (WXT520 w/ H-ADCP)"
-        dataset.publisher_name = "UVI & OCOVI"
-        dataset.publisher_url = "www.ocovi.org"
-        dataset.publisher_email = "ocovi@caricoos.org"
+        dataset.publisher_name = "CARICOOS"
+        dataset.publisher_country = "United States of America"
+        dataset.publisher_state = "PR"
+        dataset.publisher_city = "Mayaguez"
+        dataset.publisher_address = "Road 108, KM 1.0 Bo. Miradero"
+        dataset.publisher_postalcode = "00680"
+        dataset.publisher_institution = "UPRM R&D Center"
+        dataset.publisher_phone = "(787) 832­4040 x6454"
+        dataset.publisher_url = "www.caricoos.org"
+        dataset.publisher_email = "jorge.capella@upr.edu"
         dataset.history = "added headers to original CSV files from sutron source, historical data concatinated at 6 minute intevals " \
                           "and converted to netCDF using Python netCDF4."
         dataset.keywords = "Atmospheric Pressure, Sea level Pressure, Atmospheric Temperature, Surface Temperature, " \
                            "Humidity, Surface Winds, Ocean Winds, Ocean Currents"
         dataset.keywords_vocabulary = "GCMD Science Keywords"
-        #dataset.standard_name_vocabulary = "CF-16.0"
-        dataset.Conventions = "CF-1.6, IOOS 1.2. COARDS"
+        #dataset.standard_name_vocabulary = "CF-1.6"
+        dataset.Conventions = "IOOS 1.2, CF-1.6"
+        dataset.infoUrl = "https://www.caricoos.org/"
         #dataset.geospatial_bounds =
         dataset.geospatial_lat_min = latitude
         dataset.geospatial_lat_max = latitude
@@ -263,14 +281,19 @@ def convert2nc(srcpath, outpath):
         dataset.geospatial_vertical_positive = "up"
         dataset.geospatial_vertial_units = "meters above mean sea level"
         dataset.sea_name = "Caribbean Sea"
-        dataset.platform = "Surface floating platform"
-        dataset.platform_type = "CARICOOS Standard Buoy"
-        dataset.date_created = "2020-10-02"#date_fmt+'Z'
+        dataset.platform = "platform"
+        dataset.platform_id = "N/A"
+        dataset.platform_name = "Crown Bay Weather Station"
+        dataset.platform_type = "Stationary platform cement structure"
+        dataset.platform_vocabulary = "N/A"
+        dataset.date_created = "2020-10-05"#date_fmt+'Z'
         dataset.time_coverage_start = "2019-08-05T00:00:00Z"#date_fmt + "T00:00:00Z"
         #dataset.date_issued = #date_fmt+'Z'
         dataset.time_coverage_end = "2019-12-31T23:54:00Z"#date_fmt+"T23:54:00Z"
+        dataset.time_zone = "UTC"
         #dataset.date_modified = #rightnow_datetime_fmt
         #dataset.time_coverage_duration = "6 minutes"
+        dataset.instrument = "met & ADCP"
         dataset.met_vendor = "VAISALA & Teledyne RD Instruments"
         dataset.met_model = "WXT520"
         dataset.met_manual = "https://www.vaisala.com/sites/default/files/documents/M210906EN-C.pdf"
@@ -281,13 +304,14 @@ def convert2nc(srcpath, outpath):
         dataset.processing_level = "0"
         dataset.comment = "The realtime status is only considered when the it has been less than " \
                           "30 days of its generation."
+        dataset.references = "http://sutronwin.com/goesweb/uvidock/"
 
         dataset.createDimension('time', None)
         dataset.createDimension('depth', len(instdepth))
         dataset.createDimension('lon', 1)
         dataset.createDimension('lat', 1)
 
-        times = dataset.createVariable("time", "f8", ('time',))
+        times = dataset.createVariable("time", "f8", ('time',), fill_value="NaN")
         times.long_name = "Measurement Time"
         times.standard_name = "time"
         times.short_name = "time"
@@ -297,14 +321,13 @@ def convert2nc(srcpath, outpath):
         times.units = "minutes since 1970-01-01 00:00:00 UTC"
         times.ioos_category = "time"
         times.axis = "T"
-        times.fill_value = "NaN"
         times.missing_value = "NaN"
         times.comment = "Coordinate variable"
-        times.reference = "https://www.programcreek.com/python/example/89490/netCDF4.date2num"
+        times.references = "https://www.programcreek.com/python/example/89490/netCDF4.date2num"
         times.note = ""
         times[:] = time
 
-        lon = dataset.createVariable("longitude", 'f8', ('lon',))
+        lon = dataset.createVariable("longitude", 'f8', ('lon',), fill_value="NaN")
         lon.long_name = "Longitude"
         lon.stardard_name = "longitude"
         #lon.short_name = "lon"
@@ -315,12 +338,10 @@ def convert2nc(srcpath, outpath):
         lon.valid_min = -180
         lon.valid_max = 180
         lon.axis = "X"
-        lon.fill_value = "NaN"
-        lon.missing_value = "NaN"
         lon.comment = "Coordinate variable"
         lon[:] = longitude
         
-        lat = dataset.createVariable("latitude", 'd', ('lat',))
+        lat = dataset.createVariable("latitude", 'd', ('lat',), fill_value="NaN")
         lat.long_name = "Latitude"
         lat.standard_name = "latitude"
         lat.short_name = "lat"
@@ -329,12 +350,10 @@ def convert2nc(srcpath, outpath):
         lat.valid_range = -90., 90.
         lat.actual_range = [18.331414, 18.331414]
         lat.axis = "Y"
-        lat.fill_value = "NaN"
-        lat.missing_value = "NaN"
         lat.comment = "Coordinate variable"
         lat[:] = latitude
 
-        depth = dataset.createVariable("depth", "f8", ("depth",))
+        depth = dataset.createVariable("depth", "f8", ("depth",), fill_value="NaN")
         depth.long_name = "Instrument Depth"
         depth.standard_name = "depth"
         depth.axis = "Z"
@@ -343,32 +362,30 @@ def convert2nc(srcpath, outpath):
         #depth.actual_range =
         depth.accuracy = 0.1
         depth.ioos_category = "Location"
-        depth.positive = "down"
-        depth.fill_value = "NaN"
         depth.missing_value = "NaN"
+        depth.positive = "down"
         depth.comment = "Coordinate variable"
         depth[:] = instdepth
 
-        barometric_pressure = dataset.createVariable("barometric_pressure", "f8", ("time", "lon", "lat",))
+        barometric_pressure = dataset.createVariable("air_pressure", "f8", ("time",), fill_value="NaN")
         barometric_pressure.long_name = "Barometric Pressure"
         barometric_pressure.standard_name = "air_pressure"
-        barometric_pressure.short_name = "BP"
+        #barometric_pressure.short_name = "BP"
         # barometric_pressure.ancillary_variables = "barometric_pressure_qc"
         barometric_pressure.observation_type = "measured"
         barometric_pressure.units = "hPa"
         barometric_pressure.range = [600, 1100]
         barometric_pressure.actual_range = [999.5, 1018.7]
-        barometric_pressure.resolution = "0.1 hPa"
+        #barometric_pressure.resolution = "0.1 hPa"
         #barometric_pressure.is_dead = 0
         barometric_pressure.ioos_category = "Wind"
-        barometric_pressure.fill_value = "NaN"
         barometric_pressure.missing_value = "NaN"
-        barometric_pressure[:, 0, 0] = pres
+        barometric_pressure[:] = presv
 
-        wind_speed = dataset.createVariable("wind_speed", "f8", ("time", "lon", "lat",))
+        wind_speed = dataset.createVariable("wind_speed", "f8", ("time", "lon", "lat",), fill_value="NaN")
         wind_speed.long_name = "Wind Speed"
         wind_speed.standard_name = "wind_speed"
-        #wind_speed.short_name = "WSPD"
+        wind_speed.short_name = "WSPD"
         # wind_speed.valid_range = "0.f", "50.f"
         wind_speed.observation_type = "measured"
         wind_speed.units = "knots"
@@ -378,11 +395,10 @@ def convert2nc(srcpath, outpath):
         wind_speed.accuracy = "+/- 3% at 10 m/s"
         wind_speed.resolution = "0.1 m/s"
         wind_speed.ioos_category = "Wind"
-        wind_speed.fill_value = "NaN"
         wind_speed.missing_value = "NaN"
         wind_speed[:, 0, 0] = wspd
 
-        wind_direction = dataset.createVariable("wind_from_direction", "f8", ("time", "lon", "lat",))
+        wind_direction = dataset.createVariable("wind_from_direction", "f8", ("time", "lon", "lat",), fill_value="NaN")
         wind_direction.long_name = "Wind Direction"
         wind_direction.standard_name = "wind_from_direction"
         # wind_direction.ancillary_variables = "wind_direction_qc"
@@ -395,11 +411,10 @@ def convert2nc(srcpath, outpath):
         wind_direction.accuracy = "+/- 3.0 degrees"
         wind_direction.resolution = "1 degree"
         wind_direction.ioos_category = "Wind"
-        wind_direction.fill_value = "NaN"
         wind_direction.missing_value = "NaN"
         wind_direction[:, 0, 0] = wdir
 
-        wind_gust = dataset.createVariable("wind_speed_of_gust", "f8", ("time", "lon", "lat",))
+        wind_gust = dataset.createVariable("wind_speed_of_gust", "f8", ("time", "lon", "lat",), fill_value="NaN")
         wind_gust.long_name = "Wind Gust Speed"
         wind_gust.standard_name = "wind_speed_of_gust"
         wind_gust.units = "knots"
@@ -409,26 +424,24 @@ def convert2nc(srcpath, outpath):
         wind_gust.precision = 0.001
         wind_gust.accuracy = 0.1
         wind_gust.ioos_category = "Wind"
-        wind_gust.fill_value = "NaN"
         wind_gust.missing_value = "NaN"
         wind_gust[:, 0, 0] = gst
 
-        air_temperature = dataset.createVariable("air_temperature", "f8", ("time", "lon", "lat",))
+        air_temperature = dataset.createVariable("air_temperature", "f8", ("time", "lon", "lat",), fill_value="NaN")
         air_temperature.long_name = "Air Temperature"
         air_temperature.standard_name = "air_temperature"
         #air_temperature.short_name = "AT"
         air_temperature.observation_type = "measured"
-        air_temperature.units = "Celsius"
+        air_temperature.units = "degree_Celsius"
         air_temperature.range = [-52, 60]
         # air_temperature.valid_range = -5.f, 40.f;
         air_temperature.accuracy = "+/- 0.3"
         air_temperature.resolution = "0.1"
         air_temperature.ioos_category = "Temperature"
-        air_temperature.fill_value = "NaN"
         air_temperature.missing_value = "NaN"
         air_temperature[:, 0, 0] = atmp
 
-        relative_humidity = dataset.createVariable("relative_humidity", "f8", ("time", "lon", "lat",))
+        relative_humidity = dataset.createVariable("relative_humidity", "f8", ("time", "lon", "lat",), fill_value="NaN")
         relative_humidity.long_name = "Relative Humidity"
         relative_humidity.standard_name = "relative_humidity"
         #relative_humidity.short_name = "RH"
@@ -439,11 +452,10 @@ def convert2nc(srcpath, outpath):
         relative_humidity.resolution = 0.1
         relative_humidity.measuring_interval = [1, 3600]
         relative_humidity.ioos_category = "Meteorology"
-        relative_humidity.fill_value = "NaN"
         relative_humidity.missing_value = "NaN"
         relative_humidity[:, 0, 0] = rehu
 
-        rain_intensity = dataset.createVariable("rainfall_rate", "f8", ("time", "lon", "lat",))
+        rain_intensity = dataset.createVariable("rainfall_rate", "f8", ("time", "lon", "lat",), fill_value="NaN")
         rain_intensity.long_name = "Precipitation Rate"
         rain_intensity.standard_name = "rainfall_rate"
         #rain_intensity.short_name = "RAIN"
@@ -451,92 +463,83 @@ def convert2nc(srcpath, outpath):
         rain_intensity.observation_type = "measured"
         rain_intensity.range = [0, 200]
         rain_intensity.ioos_category = "Meteorology"
-        rain_intensity.fill_value = "NaN"
         rain_intensity.missing_value = "NaN"
         rain_intensity[:, 0, 0] = rain
 
-        '''hail_intensity = dataset.createVariable("hail_intensity", "f8", ("time", "lon", "lat",))
+        '''hail_intensity = dataset.createVariable("hail_intensity", "f8", ("time", "lon", "lat",), fill_value="NaN")
         hail_intensity.long_name = "Hail Precipitation Rate"
         hail_intensity.standard_name = "hail_intensity"
         #hail_intensity.short_name = "HAIL"
         hail_intensity.observation_type = "measured"
         hail_intensity.units = "hits/in^2"
         hail_intensity.ioos_category = "Meteorology"
-        hail_intensity.fill_value = "NaN"
-        hail_intensity.missing_value = "NaN"
         hail_intensity[:, 0, 0] = hail'''
 
-        '''battery_voltage = dataset.createVariable("BATTV", "f8", ("time", "lon", "lat",))
+        '''battery_voltage = dataset.createVariable("BATTV", "f8", ("time", "lon", "lat",), fill_value="NaN")
         battery_voltage.long_name = "Battery"
         battery_voltage.standard_name = "battery"
         battery_voltage.short_name = "BATTV"
         battery_voltage.observation_type = "measured"
         battery_voltage.units = "volts"
-        battery_voltage.fill_value = "NaN"
-        battery_voltage.missing_value = "NaN"
         battery_voltage[:, 0, 0] = battv'''
 
-        instrument_heading = dataset.createVariable("heading", "f8", ("time", "lon", "lat",))
+        instrument_heading = dataset.createVariable("heading", "f8", ("time", "lon", "lat",), fill_value="NaN")
         instrument_heading.long_name = "Platform Heading"
         #instrument_heading.standard_name = "heading"
         #instrument_heading.short_name = "heading"
         instrument_heading.units = "degrees" #magnetic
         instrument_heading.observation_type = "measured"
-        instrument_heading.fill_value = "NaN"
         instrument_heading.missing_value = "NaN"
         instrument_heading[:, 0, 0] = insthead
 
-        instrument_pitch = dataset.createVariable("pitch", "f8", ("time", "lon", "lat",))
+        instrument_pitch = dataset.createVariable("pitch", "f8", ("time", "lon", "lat",), fill_value="NaN")
         instrument_pitch.long_name = "Platform Pitch"
         #instrument_pitch.standard_name = "pitch"
         instrument_pitch.short_name = "pitch"
         instrument_pitch.units = "degrees"
         instrument_pitch.observation_type = "measured"
-        instrument_pitch.fill_value = "NaN"
         instrument_pitch.missing_value = "NaN"
         instrument_pitch[:, 0, 0] = instpitch
 
-        instrument_roll = dataset.createVariable("roll", "f8", ("time", "lon", "lat",))
+        instrument_roll = dataset.createVariable("roll", "f8", ("time", "lon", "lat",), fill_value="NaN")
         instrument_roll.long_name = "Platform Roll"
         #instrument_roll.standard_name = "roll"
         #instrument_roll.short_name = "roll"
         instrument_roll.units = "degrees"
         instrument_roll.observation_type = "measured"
-        instrument_roll.fill_value = "NaN"
         instrument_roll.missing_value = "NaN"
         instrument_roll[:, 0, 0] = instroll
 
-        instrument_pressure = dataset.createVariable("pres", "f8", ("time", "lon", "lat",))
+        instrument_pressure = dataset.createVariable("instrument_pres", "f8", ("time", "lon", "lat",), fill_value="NaN")
         instrument_pressure.long_name = "Platform Pressure"
         #instrument_pressure.standard_name = "pressure"
         instrument_pressure.short_name = "pres"
         instrument_pressure.units = "kPa"
         instrument_pressure.observation_type = "measured"
-        instrument_pressure.fill_value = "NaN"
         instrument_pressure.missing_value = "NaN"
         instrument_pressure[:, 0, 0] = instpres
 
-        east_velocity1 = dataset.createVariable("current_u_01", "f8", ("time", "lon", "lat",))
+        east_velocity1 = dataset.createVariable("current_u_01", "f8", ("time", "lon", "lat",), fill_value="NaN")
         east_velocity1.long_name = "Eastward Sea Water Velocity"
         east_velocity1.standard_name = "eastward_sea_water_velocity"
         east_velocity1.short_name = "u"
         east_velocity1.units = "01 mm s-1"
         east_velocity1.observation_type = "measured"
-        east_velocity1.is_dead = "NaN"
+        east_velocity1.missing_value = "NaN"
         east_velocity1.ioos_category = "Currents"
         east_velocity1[:, 0, 0] = evb1
 
-        north_velocity1 = dataset.createVariable("current_v_01", "f8", ("time", "lon", "lat",))
+        north_velocity1 = dataset.createVariable("current_v_01", "f8", ("time", "lon", "lat",), fill_value="NaN")
         north_velocity1.long_name = "Northward Sea Water Velocity"
         north_velocity1.standard_name = "northward_sea_water_velocity"
         north_velocity1.short_name = "v"
         north_velocity1.units = "01 mm s-1"
         north_velocity1.observation_type = "measured"
         north_velocity1.ioos_category = "Currents"
-        north_velocity1.is_dead = "NaN"
+        north_velocity1.missing_value = "NaN"
         north_velocity1[:, 0, 0] = nvb1
 
-        east_velocity2 = dataset.createVariable("current_u_02", "f8", ("time", "lon", "lat",))
+        '''east_velocity2 = dataset.createVariable("current_u_02", "f8", ("time", "lon", "lat",))
         east_velocity2.long_name = "Eastward Sea Water Velocity"
         east_velocity2.standard_name = "eastward_sea_water_velocity"
         east_velocity2.short_name = "u"
@@ -914,9 +917,9 @@ def convert2nc(srcpath, outpath):
         north_velocity20.observation_type = "measured"
         north_velocity20.ioos_category = "Currents"
         north_velocity20.is_dead = "NaN"
-        north_velocity20[:, 0, 0] = nvb20
+        north_velocity20[:, 0, 0] = nvb20'''
         
-        mean_current_velocity_magnitude = dataset.createVariable("mean_current_speed", "f8", ("time", "lon", "lat",))
+        mean_current_velocity_magnitude = dataset.createVariable("current_speed", "f8", ("time", "lon", "lat",), fill_value="NaN")
         mean_current_velocity_magnitude.long_name = "Mean Current Speed"
         #mean_current_velocity_magnitude.standard_name = "mean_current_speed"
         mean_current_velocity_magnitude.short_name = "MCSPD"
@@ -928,10 +931,10 @@ def convert2nc(srcpath, outpath):
         # mean_current_velocity_magnitude.precision = 0.1
         # mean_current_velocity_magnitude.accuracy = 0.5
         mean_current_velocity_magnitude.ioos_category = "Currents"
-        mean_current_velocity_magnitude.is_dead = "NaN"
+        mean_current_velocity_magnitude.missing_value = "NaN"
         mean_current_velocity_magnitude[:, 0, 0] = mcspd
 
-        mean_current_velocity_direction = dataset.createVariable("mean_current_direction", "f8", ("time", "lon", "lat",))
+        mean_current_velocity_direction = dataset.createVariable("current_direction", "f8", ("time", "lon", "lat",), fill_value="NaN")
         mean_current_velocity_direction.long_name = "Mean Current Direction"
         #mean_current_velocity_direction.standard_name = "mean_current_direction"
         mean_current_velocity_direction.short_name = "MCDIR"
@@ -944,7 +947,7 @@ def convert2nc(srcpath, outpath):
         # mean_current_velocity_direction.precision = 0.35
         # mean_current_velocity_direction.accuracy = 2
         mean_current_velocity_direction.ioos_category = "Currents"
-        mean_current_velocity_direction.is_dead = "NaN"
+        mean_current_velocity_direction.missing_value = "NaN"
         mean_current_velocity_direction[:, 0, 0] = mcdir
 
         '''percent_good_bin_01 = dataset.createVariable("PGB01", "f8", ("time", "lon", "lat",))
